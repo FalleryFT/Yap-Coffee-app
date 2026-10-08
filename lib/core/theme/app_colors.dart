@@ -15,4 +15,12 @@ class AppColors {
   static const Color cardLine = Color(0xFFEAE8E3); // garis tepi kartu
   static const Color peach = Color(0xFFFFDCC2); // lingkaran ikon di Login
   static const Color danger = Color(0xFFB3261E);
+  static const Color heroBrown = Color(0xFF543928);
+  static const Color statusBg = Color(0xFFEDE9E2);
+  static const Color statusOlive = Color(0xFF435436);
+  static const Color chipBrown = Color(0xFF785135);
+  static const Color buttonPeach = Color(0xFFE2C4AE);
+  static const Color buttonDark = Color(0xFF381F0E);
+  static const Color textMuted = Color(0xFF766A5F);
+  static const Color textDark = Color(0xFF2C190D);
 }
