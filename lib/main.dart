@@ -8,7 +8,14 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Sudah punya token: langsung ke Home, selain itu ke Login.
-  final token = await TokenStorage.instance.read();
+  // Dibungkus try-catch agar flutter_secure_storage yang gagal di web
+  // tidak mencegah runApp() terpanggil (blank screen).
+  String? token;
+  try {
+    token = await TokenStorage.instance.read();
+  } catch (_) {
+    token = null;
+  }
   final hasSession = token != null && token.isNotEmpty;
 
   runApp(

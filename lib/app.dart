@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'core/navigation/app_navigation.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/forgot_password_page.dart';
-import 'features/auth/presentation/home_page.dart';
 import 'features/auth/presentation/login_page.dart';
 import 'features/auth/presentation/new_password_page.dart';
 import 'features/auth/presentation/register_page.dart';
+import 'features/home/presentation/main_shell_page.dart';
 
 class YapCoffeeApp extends StatelessWidget {
   const YapCoffeeApp({super.key, required this.initialRoute});
@@ -28,7 +28,9 @@ class YapCoffeeApp extends StatelessWidget {
         if (args is! NewPasswordArgs) return null;
         page = NewPasswordPage(args: args);
       case AppRoutes.home:
-        page = const HomePage();
+        page = const MainShellPage(initialIndex: 0);
+      case AppRoutes.menu:
+        page = const MainShellPage(initialIndex: 1);
       default:
         return null;
     }
