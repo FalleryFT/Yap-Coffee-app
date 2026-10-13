@@ -499,7 +499,6 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            CartManager.instance.triggerPlusPressed();
                             AddToCartBottomSheet.show(
                               context,
                               item: item,

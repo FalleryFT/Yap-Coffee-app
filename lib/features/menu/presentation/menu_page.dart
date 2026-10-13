@@ -202,7 +202,6 @@ class _MenuPageState extends State<MenuPage> {
   Widget _buildMenuProductCard(BuildContext context, CoffeeItem item) {
     return GestureDetector(
       onTap: () {
-        CartManager.instance.triggerPlusPressed();
         AddToCartBottomSheet.show(
           context,
           item: item,
@@ -317,7 +316,6 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    CartManager.instance.triggerPlusPressed();
                     AddToCartBottomSheet.show(
                       context,
                       item: item,
