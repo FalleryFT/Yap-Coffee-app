@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../cart/data/cart_manager.dart';
 import '../../menu/data/coffee_item_model.dart';
 import '../../menu/presentation/add_to_cart_bottom_sheet.dart';
 
@@ -497,7 +498,21 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => AddToCartBottomSheet.show(context, item: item),
+                          onTap: () {
+                            CartManager.instance.triggerPlusPressed();
+                            AddToCartBottomSheet.show(
+                              context,
+                              item: item,
+                              onAddToCart: (coffeeItem, quantity, size, sugar) {
+                                CartManager.instance.addCoffeeItem(
+                                  item: coffeeItem,
+                                  quantity: quantity,
+                                  size: size,
+                                  sugar: sugar,
+                                );
+                              },
+                            );
+                          },
                           child: Container(
                             width: 32,
                             height: 32,

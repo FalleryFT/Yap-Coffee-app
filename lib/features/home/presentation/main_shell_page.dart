@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/navigation/app_navigation.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../cart/data/cart_manager.dart';
+import '../../cart/presentation/cart_page.dart';
 import '../../profile/presentation/profile_page.dart';
 import '../../orders/presentation/orders_page.dart';
 import '../../menu/presentation/menu_page.dart';
@@ -18,10 +20,22 @@ class MainShellPage extends StatefulWidget {
 
 class _MainShellPageState extends State<MainShellPage> {
   late int _currentIndex = widget.initialIndex;
-  int _cartCount = 2;
+  final CartManager _cartManager = CartManager.instance;
 
-  void incrementCart([int count = 1]) {
-    setState(() => _cartCount += count);
+  @override
+  void initState() {
+    super.initState();
+    _cartManager.addListener(_onCartChanged);
+  }
+
+  @override
+  void dispose() {
+    _cartManager.removeListener(_onCartChanged);
+    super.dispose();
+  }
+
+  void _onCartChanged() {
+    if (mounted) setState(() {});
   }
 
   void _onTabTapped(int index) {
@@ -32,153 +46,11 @@ class _MainShellPageState extends State<MainShellPage> {
     setState(() => _currentIndex = 1);
   }
 
-  void _showCartSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: AppColors.cream,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: MediaQuery.of(ctx).padding.bottom + 20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Keranjang Belanja',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.buttonPeach,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '$_cartCount Item',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  icon: const Icon(Icons.close_rounded, color: AppColors.textDark),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFECE7DE)),
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      'assets/images/es_kopi_susu.png',
-                      width: 52,
-                      height: 52,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          '2× Es Kopi Susu Gula Aren',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Reguler, Less Sugar • Kloter 10:00',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Text(
-                    'Rp 44.000',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Menuju proses checkout...'),
-                      backgroundColor: AppColors.buttonDark,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.buttonDark,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Text(
-                  'Lanjut ke Checkout (Rp 44.000)',
-                  style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+  void _openCartPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CartPage()),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,19 +62,22 @@ class _MainShellPageState extends State<MainShellPage> {
             index: _currentIndex,
             children: [
               HomeView(onSeeAllTapped: _switchToMenu),
+              MenuPage(onCartTapped: _openCartPage),
+              _buildOrdersPlaceholder(),
+              _buildProfilePlaceholder(),
               MenuPage(onCartTapped: _showCartSheet),
               const OrdersPage(),
               const ProfilePage(),
             ],
           ),
 
-          // Floating Cart Button (shown on Home and Menu screens)
-          if (_currentIndex == 0 || _currentIndex == 1)
+          // Floating Cart Button (shown on Home and Menu screens only when plus has been tapped)
+          if ((_currentIndex == 0 || _currentIndex == 1) && _cartManager.isCartButtonVisible)
             Positioned(
               right: 18,
               bottom: 80,
               child: GestureDetector(
-                onTap: _showCartSheet,
+                onTap: _openCartPage,
                 child: Container(
                   width: 52,
                   height: 52,
@@ -226,7 +101,7 @@ class _MainShellPageState extends State<MainShellPage> {
                         color: Colors.white,
                         size: 24,
                       ),
-                      if (_cartCount > 0)
+                      if (_cartManager.totalItemCount > 0)
                         Positioned(
                           top: -2,
                           right: -2,
@@ -242,7 +117,7 @@ class _MainShellPageState extends State<MainShellPage> {
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              '$_cartCount',
+                              '${_cartManager.totalItemCount}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
