@@ -59,17 +59,15 @@ class _MainShellPageState extends State<MainShellPage> {
         children: [
           // Indexed body views
           IndexedStack(
-            index: _currentIndex,
-            children: [
-              HomeView(onSeeAllTapped: _switchToMenu),
-              MenuPage(onCartTapped: _openCartPage),
-              _buildOrdersPlaceholder(),
-              _buildProfilePlaceholder(),
-              MenuPage(onCartTapped: _showCartSheet),
-              const OrdersPage(),
-              const ProfilePage(),
-            ],
-          ),
+  index: _currentIndex,
+  children: [
+    HomeView(onSeeAllTapped: _switchToMenu),
+    MenuPage(onCartTapped: _openCartPage),
+    const OrdersPage(),
+    const ProfilePage(),
+  ],
+),
+          
 
           // Floating Cart Button (shown on Home and Menu screens only when plus has been tapped)
           if ((_currentIndex == 0 || _currentIndex == 1) && _cartManager.isCartButtonVisible)
