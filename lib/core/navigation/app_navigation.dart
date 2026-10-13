@@ -13,4 +13,5 @@ class AppRoutes {
   static const String newPassword = '/new-password';
   static const String home = '/home';
   static const String menu = '/menu';
+  static const String cart = '/cart';
 }
