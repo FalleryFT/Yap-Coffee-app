@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/navigation/app_navigation.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../profile/presentation/profile_page.dart';
+import '../../orders/presentation/orders_page.dart';
 import '../../menu/presentation/menu_page.dart';
 import 'home_view.dart';
 
@@ -189,8 +191,8 @@ class _MainShellPageState extends State<MainShellPage> {
             children: [
               HomeView(onSeeAllTapped: _switchToMenu),
               MenuPage(onCartTapped: _showCartSheet),
-              _buildOrdersPlaceholder(),
-              _buildProfilePlaceholder(),
+              const OrdersPage(),
+              const ProfilePage(),
             ],
           ),
 
