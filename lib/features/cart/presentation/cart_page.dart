@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../menu/presentation/add_to_cart_bottom_sheet.dart';
 import '../data/cart_manager.dart';
+import '../../checkout/presentation/checkout_page.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -479,18 +480,8 @@ class _CartPageState extends State<CartPage> {
       height: 48,
       child: ElevatedButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Menuju checkout (${_formatCurrency(_cartManager.grandTotal)})...',
-              ),
-              backgroundColor: const Color(0xFF432406),
-              duration: const Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const CheckoutPage()),
           );
         },
         style: ElevatedButton.styleFrom(

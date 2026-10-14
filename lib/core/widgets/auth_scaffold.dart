@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// Kerangka semua layar autentikasi: latar krem dan kartu putih di tengah.
+/// Kerangka semua layar autentikasi: latar bergambar dan kartu putih di tengah.
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({
     super.key,
     required this.child,
     this.showBack = false,
-    this.backgroundImage,
+    this.backgroundImage = defaultBackground,
   });
+
+  /// Latar bawaan yang dipakai Login, Register, Lupa Password, dan Sandi Baru.
+  static const String defaultBackground = 'assets/images/login_bg.jpg';
 
   final Widget child;
   final bool showBack;
 
-  /// Jalur aset gambar latar (dipakai layar Login).
+  /// Jalur aset gambar latar. Isi null bila ingin latar krem polos.
   final String? backgroundImage;
 
   @override
