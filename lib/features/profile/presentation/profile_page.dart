@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/navigation/app_navigation.dart';
 import '../../../core/theme/app_colors.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../auth/data/auth_repository.dart';
 import '../data/profile_model.dart';
 import 'edit_profile_page.dart';
@@ -111,7 +112,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Color(0xFFECE7DE),
                   ),
                   _MenuRow(
-                    icon: Icons.chat_bubble_outline_rounded,
+                    iconWidget: const FaIcon(
+                      FontAwesomeIcons.whatsapp,
+                      size: 21,
+                      color: AppColors.textDark,
+                    ),
                     label: 'Hubungi Penjual',
                     trailing: const Icon(
                       Icons.chevron_right_rounded,
@@ -155,7 +160,11 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          ProfileAvatar(assetPath: _profile.avatarAsset, size: 76),
+          ProfileAvatar(
+            assetPath: _profile.avatarAsset,
+            imageBytes: _profile.avatarBytes,
+            size: 76,
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -240,13 +249,15 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 class _MenuRow extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
+  final Widget? iconWidget;
   final String label;
   final Widget trailing;
   final VoidCallback onTap;
 
   const _MenuRow({
-    required this.icon,
+    this.icon,
+    this.iconWidget,
     required this.label,
     required this.trailing,
     required this.onTap,
@@ -268,7 +279,12 @@ class _MenuRow extends StatelessWidget {
                 color: Color(0xFFF1ECE4),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 22, color: AppColors.textDark),
+              child: Center(
+                child: iconWidget ??
+                    (icon != null
+                        ? Icon(icon, size: 22, color: AppColors.textDark)
+                        : const SizedBox.shrink()),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(

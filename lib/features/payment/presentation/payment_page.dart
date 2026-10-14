@@ -328,15 +328,15 @@ class _PaymentPageState extends State<PaymentPage> {
         border: Border.all(color: AppColors.line),
       ),
       clipBehavior: Clip.antiAlias,
-      // Simpan gambar stiker di assets/images/payment_success.png
       child: Image.asset(
-        'assets/images/payment_success.png',
+        'assets/images/Untitled.jpg',
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const Center(
-          child: Icon(
-            Icons.check_circle_outline,
-            size: 64,
-            color: AppColors.statusOlive,
+        errorBuilder: (context, error, stackTrace) => Image.asset(
+          'assets/images/Untitled.jpeg',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Image.asset(
+            'assets/images/payment_success.png',
+            fit: BoxFit.cover,
           ),
         ),
       ),
