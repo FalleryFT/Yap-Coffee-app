@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class ProfileModel {
   final String fullName;
   final String phone;
@@ -5,6 +7,7 @@ class ProfileModel {
   final String joinedLabel;
   final String passwordUpdatedLabel;
   final String avatarAsset;
+  final Uint8List? avatarBytes;
 
   const ProfileModel({
     required this.fullName,
@@ -13,6 +16,7 @@ class ProfileModel {
     required this.joinedLabel,
     required this.passwordUpdatedLabel,
     this.avatarAsset = 'assets/images/profile_photo.png',
+    this.avatarBytes,
   });
 
   /// Nama panggilan = kata pertama dari nama lengkap.
@@ -26,6 +30,9 @@ class ProfileModel {
     String? phone,
     String? email,
     String? passwordUpdatedLabel,
+    String? avatarAsset,
+    Uint8List? avatarBytes,
+    bool clearAvatarBytes = false,
   }) {
     return ProfileModel(
       fullName: fullName ?? this.fullName,
@@ -33,7 +40,8 @@ class ProfileModel {
       email: email ?? this.email,
       joinedLabel: joinedLabel,
       passwordUpdatedLabel: passwordUpdatedLabel ?? this.passwordUpdatedLabel,
-      avatarAsset: avatarAsset,
+      avatarAsset: avatarAsset ?? this.avatarAsset,
+      avatarBytes: clearAvatarBytes ? null : (avatarBytes ?? this.avatarBytes),
     );
   }
 }

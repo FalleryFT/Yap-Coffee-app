@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../cart/data/cart_manager.dart';
 import '../../menu/data/coffee_item_model.dart';
 import '../../menu/presentation/add_to_cart_bottom_sheet.dart';
@@ -281,30 +282,44 @@ class _HomeViewState extends State<HomeView> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBE6DF),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.chat_bubble_outline_rounded,
-                        color: Color(0xFF2B180D),
-                        size: 16,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Hubungi Penjual',
-                        style: TextStyle(
-                          color: Color(0xFF2B180D),
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
+                child: GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Membuka WhatsApp penjual...'),
+                        backgroundColor: AppColors.buttonDark,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEBE6DF),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        FaIcon(
+                          FontAwesomeIcons.whatsapp,
+                          color: Color(0xFF2B180D),
+                          size: 17,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Hubungi Penjual',
+                          style: TextStyle(
+                            color: Color(0xFF2B180D),
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

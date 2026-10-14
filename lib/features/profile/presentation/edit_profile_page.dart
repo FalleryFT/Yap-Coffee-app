@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
@@ -28,6 +30,7 @@ class _EditProfilePageState extends State<EditProfilePage>
       TextEditingController(text: widget.profile.phone);
   late final TextEditingController _email =
       TextEditingController(text: widget.profile.email);
+  late Uint8List? _avatarBytes = widget.profile.avatarBytes;
 
   @override
   void dispose() {
@@ -35,6 +38,183 @@ class _EditProfilePageState extends State<EditProfilePage>
     _phone.dispose();
     _email.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      if (picked != null) {
+        final bytes = await picked.readAsBytes();
+        if (mounted) {
+          setState(() {
+            _avatarBytes = bytes;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          'Gagal mengambil gambar: $e',
+          isError: true,
+        );
+      }
+    }
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Ubah Foto Profil',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Pilih foto dari galeri atau ambil foto langsung lewat kamera',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.cream,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.photo_camera_rounded,
+                    color: AppColors.buttonDark,
+                  ),
+                ),
+                title: const Text(
+                  'Ambil Foto Lewat Kamera',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Gunakan kamera untuk mengambil foto baru',
+                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                ),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.cream,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.photo_library_rounded,
+                    color: AppColors.buttonDark,
+                  ),
+                ),
+                title: const Text(
+                  'Pilih dari Galeri',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Pilih foto yang tersimpan di perangkat Anda',
+                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                ),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              if (_avatarBytes != null) ...[
+                const SizedBox(height: 8),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFDAD6),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: Color(0xFF9B1C1C),
+                    ),
+                  ),
+                  title: const Text(
+                    'Hapus Foto Kustom',
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF9B1C1C),
+                    ),
+                  ),
+                  subtitle: const Text(
+                    'Kembalikan ke foto profil default',
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  ),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    setState(() {
+                      _avatarBytes = null;
+                    });
+                  },
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _save() async {
@@ -52,6 +232,8 @@ class _EditProfilePageState extends State<EditProfilePage>
           fullName: _name.text.trim(),
           phone: _phone.text.trim(),
           email: _email.text.trim(),
+          avatarBytes: _avatarBytes,
+          clearAvatarBytes: _avatarBytes == null,
         ),
       );
     }
@@ -75,17 +257,24 @@ class _EditProfilePageState extends State<EditProfilePage>
             children: [
               _buildHeader(),
               const SizedBox(height: 20),
-              Center(
-                child: ProfileAvatar(
-                  assetPath: widget.profile.avatarAsset,
-                  size: 100,
-                  showCameraBadge: true,
+              GestureDetector(
+                onTap: _showImagePickerOptions,
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  children: [
+                    ProfileAvatar(
+                      assetPath: widget.profile.avatarAsset,
+                      imageBytes: _avatarBytes,
+                      size: 100,
+                      showCameraBadge: true,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Ketuk untuk mengganti foto profile',
+                      style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Ketuk untuk mengganti foto profile',
-                style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
               ),
               const SizedBox(height: 22),
               _buildFormCard(),
