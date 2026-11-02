@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../menu/component/add_to_cart_sheet.dart';
 import '../../menu/data/coffee_item_model.dart';
-import '../../menu/presentation/add_to_cart_bottom_sheet.dart';
 
 class CartItem {
   final String id;
@@ -29,33 +29,8 @@ class CartManager extends ChangeNotifier {
   static final CartManager instance = CartManager._internal();
   CartManager._internal();
 
-  /// Default demo items matching Figma design in tampilan apps/Keranjang.svg
-  final List<CartItem> _items = [
-    CartItem(
-      id: 'yap-latte-design',
-      name: 'Yap Latte',
-      variant: 'Reguler, Less Sugar',
-      price: 22000,
-      quantity: 1,
-      imageAsset: 'assets/images/Keranjang.svg_0.jpeg',
-      originalItem: CoffeeData.homeFavorites.firstWhere(
-        (it) => it.id == 'yap-latte',
-        orElse: () => CoffeeData.homeFavorites.first,
-      ),
-    ),
-    CartItem(
-      id: 'classic-croissant-design',
-      name: 'Classic Croissant',
-      variant: 'Toasted',
-      price: 25000,
-      quantity: 2,
-      imageAsset: 'assets/images/Keranjang.svg_1.jpeg',
-      originalItem: CoffeeData.homeFavorites.firstWhere(
-        (it) => it.id == 'butter-croissant',
-        orElse: () => CoffeeData.homeFavorites.last,
-      ),
-    ),
-  ];
+  /// Keranjang mulai kosong; item hanya masuk saat pengguna menekan '+'.
+  final List<CartItem> _items = [];
 
   /// Cart icon is hidden by default on Home/Menu until user taps '+' button.
   bool _hasPressedPlus = false;
@@ -90,15 +65,8 @@ class CartManager extends ChangeNotifier {
     required SugarLevel sugar,
   }) {
     _hasPressedPlus = true;
-    final sizeText = size == CupSize.reguler ? 'Reguler' : 'Large';
-    final sugarText = switch (sugar) {
-      SugarLevel.normal => 'Normal',
-      SugarLevel.lessSugar => 'Less Sugar',
-      SugarLevel.noSugar => 'No Sugar',
-    };
-    final variantText = '$sizeText, $sugarText';
-    final extraPrice = size == CupSize.large ? 5000 : 0;
-    final unitPrice = item.price + extraPrice;
+    final variantText = '${size.label}, ${sugar.label}';
+    final unitPrice = item.price + size.extraPrice;
 
     final existingIndex = _items.indexWhere(
       (it) => it.name == item.name && it.variant == variantText,
@@ -107,13 +75,6 @@ class CartManager extends ChangeNotifier {
     if (existingIndex >= 0) {
       _items[existingIndex].quantity += quantity;
     } else {
-      String imageToUse = item.imageAsset;
-      if (item.name.toLowerCase().contains('latte')) {
-        imageToUse = 'assets/images/Keranjang.svg_0.jpeg';
-      } else if (item.name.toLowerCase().contains('croissant')) {
-        imageToUse = 'assets/images/Keranjang.svg_1.jpeg';
-      }
-
       _items.add(
         CartItem(
           id: '${DateTime.now().millisecondsSinceEpoch}_${item.id}',
@@ -121,7 +82,7 @@ class CartManager extends ChangeNotifier {
           variant: variantText,
           price: unitPrice,
           quantity: quantity,
-          imageAsset: imageToUse,
+          imageAsset: item.imageAsset,
           originalItem: item,
         ),
       );

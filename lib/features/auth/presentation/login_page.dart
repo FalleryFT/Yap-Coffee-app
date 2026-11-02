@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/auth_footer_link.dart';
+import '../../../core/widgets/auth_header.dart';
 import '../../../core/widgets/auth_scaffold.dart';
 import '../../../core/widgets/form_submit_mixin.dart';
 import '../../../core/widgets/password_field.dart';
@@ -69,20 +70,10 @@ class _LoginPageState extends State<LoginPage> with FormSubmitMixin<LoginPage> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Yap Coffee',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppColors.espresso,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Selamat datang kembali, tetangga!',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14),
+            const AuthHeader(
+              title: 'Yap Coffee',
+              subtitle: 'Selamat datang kembali, tetangga!',
+              fontSize: 24,
             ),
             const SizedBox(height: 28),
             AppTextField(

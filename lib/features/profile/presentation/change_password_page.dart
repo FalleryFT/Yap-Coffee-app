@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
-import '../../../core/widgets/app_snackbar.dart';
+import '../../../core/widgets/app_notification.dart';
+import '../../../core/widgets/auth_header.dart';
 import '../../../core/widgets/auth_scaffold.dart';
 import '../../../core/widgets/form_submit_mixin.dart';
 import '../../../core/widgets/password_field.dart';
@@ -39,11 +39,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage>
     });
 
     if (ok && mounted) {
-      showAppSnackBar(
-        context,
-        'Kata sandi berhasil diubah.',
-        isError: false,
-      );
+      AppNotification.success(context, 'Kata sandi berhasil diubah.');
       Navigator.of(context).pop();
     }
   }
@@ -57,20 +53,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Buat Sandi Baru',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: AppColors.espresso,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Masukkan sandi lama dan sandi baru',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13.5, color: AppColors.bark),
+            const AuthHeader(
+              title: 'Buat Sandi Baru',
+              subtitle: 'Masukkan sandi lama dan sandi baru',
+              fontSize: 26,
             ),
             const SizedBox(height: 24),
             PasswordField(

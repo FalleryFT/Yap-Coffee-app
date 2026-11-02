@@ -1,16 +1,19 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/validators.dart';
-import '../../../core/widgets/app_snackbar.dart';
-import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/app_notification.dart';
+import '../../../core/widgets/app_page_header.dart';
 import '../../../core/widgets/form_submit_mixin.dart';
 import '../../../core/widgets/primary_button.dart';
+import '../component/avatar_picker_section.dart';
+import '../component/avatar_source_sheet.dart';
+import '../component/edit_profile_form_card.dart';
+import '../component/security_account_card.dart';
 import '../data/profile_model.dart';
 import 'change_password_page.dart';
-import 'profile_avatar.dart';
 
 class EditProfilePage extends StatefulWidget {
   final ProfileModel profile;
@@ -59,161 +62,17 @@ class _EditProfilePageState extends State<EditProfilePage>
       }
     } catch (e) {
       if (mounted) {
-        showAppSnackBar(
-          context,
-          'Gagal mengambil gambar: $e',
-          isError: true,
-        );
+        AppNotification.error(context, 'Gagal mengambil gambar: $e');
       }
     }
   }
 
   void _showImagePickerOptions() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext ctx) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.line,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              const Text(
-                'Ubah Foto Profil',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'Pilih foto dari galeri atau ambil foto langsung lewat kamera',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textMuted,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.cream,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.photo_camera_rounded,
-                    color: AppColors.buttonDark,
-                  ),
-                ),
-                title: const Text(
-                  'Ambil Foto Lewat Kamera',
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                subtitle: const Text(
-                  'Gunakan kamera untuk mengambil foto baru',
-                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                ),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  _pickImage(ImageSource.camera);
-                },
-              ),
-              const SizedBox(height: 8),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.cream,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.photo_library_rounded,
-                    color: AppColors.buttonDark,
-                  ),
-                ),
-                title: const Text(
-                  'Pilih dari Galeri',
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                subtitle: const Text(
-                  'Pilih foto yang tersimpan di perangkat Anda',
-                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                ),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-              if (_avatarBytes != null) ...[
-                const SizedBox(height: 8),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFDAD6),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline_rounded,
-                      color: Color(0xFF9B1C1C),
-                    ),
-                  ),
-                  title: const Text(
-                    'Hapus Foto Kustom',
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF9B1C1C),
-                    ),
-                  ),
-                  subtitle: const Text(
-                    'Kembalikan ke foto profil default',
-                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    setState(() {
-                      _avatarBytes = null;
-                    });
-                  },
-                ),
-              ],
-            ],
-          ),
-        );
-      },
+    showAvatarSourceSheet(
+      context,
+      hasCustomAvatar: _avatarBytes != null,
+      onPick: _pickImage,
+      onRemove: () => setState(() => _avatarBytes = null),
     );
   }
 
@@ -226,7 +85,7 @@ class _EditProfilePageState extends State<EditProfilePage>
     });
 
     if (ok && mounted) {
-      showAppSnackBar(context, 'Profil berhasil diperbarui.', isError: false);
+      AppNotification.success(context, 'Profil berhasil diperbarui.');
       Navigator.of(context).pop(
         widget.profile.copyWith(
           fullName: _name.text.trim(),
@@ -255,31 +114,32 @@ class _EditProfilePageState extends State<EditProfilePage>
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           child: Column(
             children: [
-              _buildHeader(),
+              AppPageHeader(
+                title: 'Edit Profile',
+                icon: Icons.person_outline_rounded,
+                onBack: () => Navigator.of(context).pop(),
+              ),
               const SizedBox(height: 20),
-              GestureDetector(
+              AvatarPickerSection(
+                assetPath: widget.profile.avatarAsset,
+                imageBytes: _avatarBytes,
                 onTap: _showImagePickerOptions,
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  children: [
-                    ProfileAvatar(
-                      assetPath: widget.profile.avatarAsset,
-                      imageBytes: _avatarBytes,
-                      size: 100,
-                      showCameraBadge: true,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Ketuk untuk mengganti foto profile',
-                      style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
-                    ),
-                  ],
-                ),
               ),
               const SizedBox(height: 22),
-              _buildFormCard(),
+              EditProfileFormCard(
+                formKey: _formKey,
+                name: _name,
+                phone: _phone,
+                email: _email,
+                serverError: serverError,
+                clearServerError: clearServerError,
+              ),
               const SizedBox(height: 14),
-              _buildSecurityCard(),
+              SecurityAccountCard(
+                joinedLabel: widget.profile.joinedLabel,
+                passwordUpdatedLabel: widget.profile.passwordUpdatedLabel,
+                onChangePassword: _openChangePassword,
+              ),
               const SizedBox(height: 22),
               PrimaryButton(
                 label: 'Simpan Perubahan',
@@ -302,289 +162,6 @@ class _EditProfilePageState extends State<EditProfilePage>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              color: AppColors.buttonDark,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.person_outline_rounded,
-              size: 20,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        const Text(
-          'Edit Profile',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textDark,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFormCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            AppTextField(
-              label: 'Nama Lengkap',
-              controller: _name,
-              hint: 'Masukkan nama lengkap',
-              icon: Icons.person_outline_rounded,
-              textInputAction: TextInputAction.next,
-              autofillHints: const [AutofillHints.name],
-              validator: (v) => Validators.notEmpty(v, 'Nama lengkap'),
-              errorText: serverError('name'),
-              onChanged: (_) => clearServerError('name'),
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              label: 'Nomor Handphone / WhatsApp',
-              controller: _phone,
-              hint: '0812 3456 7890',
-              icon: Icons.phone_outlined,
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.next,
-              autofillHints: const [AutofillHints.telephoneNumber],
-              validator: Validators.phone,
-              errorText: serverError('phone'),
-              onChanged: (_) => clearServerError('phone'),
-              labelAction: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDDE6BC),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(
-                      Icons.verified_rounded,
-                      size: 13,
-                      color: Color(0xFF435436),
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      'Terverifikasi',
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF435436),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              label: 'Alamat Email',
-              controller: _email,
-              hint: 'nama@email.com',
-              icon: Icons.mail_outline_rounded,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.done,
-              autofillHints: const [AutofillHints.email],
-              validator: Validators.email,
-              errorText: serverError('email'),
-              onChanged: (_) => clearServerError('email'),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Padding(
-                  padding: EdgeInsets.only(top: 2),
-                  child: Icon(
-                    Icons.receipt_long_outlined,
-                    size: 14,
-                    color: AppColors.textMuted,
-                  ),
-                ),
-                SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'Digunakan untuk konfirmasi pesanan dan struk digital',
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      color: AppColors.textMuted,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSecurityCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Keamanan & Akun',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textDark,
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Status keanggotaan
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1ECE4),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFFDCC2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.calendar_today_outlined,
-                    size: 20,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Status Keanggotaan',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.profile.joinedLabel,
-                        style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.check_circle_rounded,
-                  size: 22,
-                  color: Color(0xFF55612E),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Ganti kata sandi
-          InkWell(
-            onTap: _openChangePassword,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1ECE4),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE6E0D6),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.lock_reset_rounded,
-                      size: 22,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Ganti Kata Sandi',
-                          style: TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          widget.profile.passwordUpdatedLabel,
-                          style: const TextStyle(
-                            fontSize: 11.5,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.bark,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: AppColors.cardLine),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x08000000),
-          blurRadius: 10,
-          offset: Offset(0, 3),
-        ),
-      ],
     );
   }
 }

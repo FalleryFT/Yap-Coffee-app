@@ -14,11 +14,11 @@ class ApiConfig {
 
     // Emulator Android memakai 10.0.2.2 untuk menjangkau localhost komputer.
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:3000/api';
+      return 'http://10.0.2.2:4000/api';
     }
 
     // iOS Simulator, desktop, dan web.
-    return 'http://localhost:3000/api';
+    return 'http://localhost:4000/api';
   }
 
   static const Duration timeout = Duration(seconds: 15);
