@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import 'app_notification.dart';
 
+/// Notifikasi singkat. Sekarang tampil sebagai banner di ATAS layar
+/// (lihat [AppNotification]) agar tidak tertutup tombol bawah.
 void showAppSnackBar(
   BuildContext context,
   String message, {
   bool isError = true,
 }) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? AppColors.danger : AppColors.espresso,
-      ),
-    );
+  if (isError) {
+    AppNotification.error(context, message);
+  } else {
+    AppNotification.success(context, message);
+  }
 }

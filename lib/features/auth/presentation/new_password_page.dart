@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/navigation/app_navigation.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_snackbar.dart';
+import '../../../core/widgets/auth_header.dart';
 import '../../../core/widgets/auth_scaffold.dart';
 import '../../../core/widgets/form_submit_mixin.dart';
 import '../../../core/widgets/password_field.dart';
@@ -71,21 +71,9 @@ class _NewPasswordPageState extends State<NewPasswordPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Buat Sandi Baru',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                height: 1.2,
-                fontWeight: FontWeight.w700,
-                color: AppColors.espresso,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Masukkan sandi baru',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14),
+            const AuthHeader(
+              title: 'Buat Sandi Baru',
+              subtitle: 'Masukkan sandi baru',
             ),
             const SizedBox(height: 24),
             PasswordField(

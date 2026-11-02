@@ -9,6 +9,7 @@ import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_snackbar.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/auth_footer_link.dart';
+import '../../../core/widgets/auth_header.dart';
 import '../../../core/widgets/auth_scaffold.dart';
 import '../../../core/widgets/form_submit_mixin.dart';
 import '../../../core/widgets/otp_input.dart';
@@ -118,21 +119,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Password Recovery',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 28,
-              height: 1.2,
-              fontWeight: FontWeight.w700,
-              color: AppColors.espresso,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Masukkan email untuk mengirim kode OTP.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14),
+          const AuthHeader(
+            title: 'Password Recovery',
+            subtitle: 'Masukkan email untuk mengirim kode OTP.',
           ),
           const SizedBox(height: 24),
           Form(
