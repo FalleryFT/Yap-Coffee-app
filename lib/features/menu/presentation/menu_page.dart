@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_filter_chips.dart';
+import '../../../core/widgets/app_menu_card.dart';
 import '../../../core/widgets/app_search_field.dart';
-import '../component/add_to_cart_sheet.dart';
-import '../component/menu_grid.dart';
-import '../component/menu_header.dart';
 import '../data/coffee_item_model.dart';
+import 'add_to_cart_bottom_sheet.dart';
 
 class MenuPage extends StatefulWidget {
   final VoidCallback? onCartTapped;
@@ -80,6 +79,85 @@ class _MenuPageState extends State<MenuPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Grid dua kolom berisi kartu menu.
+class MenuGrid extends StatelessWidget {
+  const MenuGrid({
+    super.key,
+    required this.items,
+    required this.onItemTapped,
+  });
+
+  final List<CoffeeItem> items;
+  final ValueChanged<CoffeeItem> onItemTapped;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 90),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisExtent: 300,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 14,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final item = items[index];
+            return AppMenuCard(
+              item: item,
+              onTap: () => onItemTapped(item),
+              onAdd: () => onItemTapped(item),
+            );
+          },
+          childCount: items.length,
+        ),
+      ),
+    );
+  }
+}
+
+/// Logo + judul halaman Menu.
+class MenuHeader extends StatelessWidget {
+  const MenuHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image.asset(
+            'assets/images/app_logo.png',
+            height: 28,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Menu Kopi',
+            style: TextStyle(
+              fontSize: 27,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Pilih racikan kopi terbaik untuk harimu.',
+            style: TextStyle(
+              fontSize: 13.5,
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

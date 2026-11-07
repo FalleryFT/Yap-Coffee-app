@@ -1,15 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_notification.dart';
 import '../../cart/data/cart_manager.dart';
-import '../component/payment_deadline_card.dart';
-import '../component/payment_qr_box.dart';
-import '../component/payment_status_card.dart';
-import '../component/payment_summary_card.dart';
-import '../component/payment_ticket_card.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key, required this.orderLines});
@@ -224,6 +219,331 @@ class _PaymentPageState extends State<PaymentPage> {
             fit: BoxFit.cover,
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Kartu batas waktu pembayaran dengan hitungan mundur.
+class PaymentDeadlineCard extends StatelessWidget {
+  const PaymentDeadlineCard({super.key, required this.timerText});
+
+  final String timerText;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      radius: 12,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          const Icon(Icons.access_time, size: 22, color: AppColors.espresso),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'BATAS PEMBAYARAN',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    letterSpacing: 0.4,
+                    color: AppColors.bark,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Selesaikan dalam 10 menit',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: AppColors.buttonDark,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.timer_outlined, size: 15, color: Colors.white),
+                const SizedBox(width: 4),
+                Text(
+                  timerText,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Kotak QR dummy untuk pengambilan pesanan.
+class PaymentQrBox extends StatelessWidget {
+  const PaymentQrBox({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 192,
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F6FA),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        children: [
+          const Text(
+            'Pengambilan Pesanan',
+            style: TextStyle(fontSize: 11, color: AppColors.ink),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: 150,
+            height: 150,
+            padding: const EdgeInsets.all(8),
+            color: Colors.white,
+            child: CustomPaint(painter: DummyQrPainter()),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// QR dummy (bukan kode asli): tiga penanda sudut + pola acak yang tetap.
+class DummyQrPainter extends CustomPainter {
+  static const int _cells = 25;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cell = size.width / _cells;
+    final paint = Paint()..color = AppColors.ink;
+    final rnd = _StableRandom(42);
+
+    bool inFinder(int x, int y) =>
+        (x < 8 && y < 8) ||
+        (x >= _cells - 8 && y < 8) ||
+        (x < 8 && y >= _cells - 8);
+
+    for (int y = 0; y < _cells; y++) {
+      for (int x = 0; x < _cells; x++) {
+        if (inFinder(x, y)) continue;
+        if (rnd.next() < 0.5) {
+          canvas.drawRect(
+            Rect.fromLTWH(x * cell, y * cell, cell + 0.4, cell + 0.4),
+            paint,
+          );
+        }
+      }
+    }
+
+    void finder(int ox, int oy) {
+      final o = Offset(ox * cell, oy * cell);
+      canvas.drawRect(Rect.fromLTWH(o.dx, o.dy, 7 * cell, 7 * cell), paint);
+      canvas.drawRect(
+        Rect.fromLTWH(o.dx + cell, o.dy + cell, 5 * cell, 5 * cell),
+        Paint()..color = Colors.white,
+      );
+      canvas.drawRect(
+        Rect.fromLTWH(o.dx + 2 * cell, o.dy + 2 * cell, 3 * cell, 3 * cell),
+        paint,
+      );
+    }
+
+    finder(0, 0);
+    finder(_cells - 7, 0);
+    finder(0, _cells - 7);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Generator acak sederhana dengan seed tetap (tanpa import dart:math).
+class _StableRandom {
+  _StableRandom(this._seed);
+
+  int _seed;
+
+  double next() {
+    _seed = (_seed * 1103515245 + 12345) & 0x7FFFFFFF;
+    return _seed / 0x7FFFFFFF;
+  }
+}
+
+/// Kartu status "pembayaran terselesaikan".
+class PaymentStatusCard extends StatelessWidget {
+  const PaymentStatusCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      radius: 12,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'pembayaran terselesaikan',
+            style: TextStyle(fontSize: 14, color: AppColors.ink),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: const Color(0xFFDDE8C4),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.check_circle,
+                  size: 16,
+                  color: AppColors.statusOlive,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Selesai',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.statusOlive,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Ringkasan baris pesanan pada halaman pembayaran.
+class PaymentSummaryCard extends StatelessWidget {
+  const PaymentSummaryCard({super.key, required this.orderLines});
+
+  final List<String> orderLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      radius: 12,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Ringkasan Pesanan',
+            style: TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1, thickness: 1, color: AppColors.line),
+          const SizedBox(height: 12),
+          for (final line in orderLines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                line,
+                style: const TextStyle(fontSize: 14.5, color: AppColors.ink),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Kartu tiket: strip cokelat di atas, nomor antrean, [child], nama pemesan.
+class PaymentTicketCard extends StatelessWidget {
+  const PaymentTicketCard({
+    super.key,
+    required this.queueNumber,
+    required this.customerName,
+    required this.child,
+  });
+
+  final String queueNumber;
+  final String customerName;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(93, 58, 26, 0.10),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Container(height: 9, color: AppColors.chipBrown),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 28, 16, 24),
+            child: Column(
+              children: [
+                const Text(
+                  'NOMOR ANTREAN',
+                  style: TextStyle(
+                    fontSize: 12,
+                    letterSpacing: 1.4,
+                    color: AppColors.bark,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  queueNumber,
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.espresso,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                child,
+                const SizedBox(height: 18),
+                const Text(
+                  'Pesanan atas nama:',
+                  style: TextStyle(fontSize: 14, color: AppColors.ink),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  customerName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.mocha,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/currency.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_empty_state.dart';
 import '../../../core/widgets/app_notification.dart';
+import '../../../core/widgets/app_order_summary_card.dart';
+import '../../../core/widgets/app_quantity_stepper.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../checkout/presentation/checkout_page.dart';
-import '../../menu/component/add_to_cart_sheet.dart';
-import '../component/cart_empty_state.dart';
-import '../component/cart_item_card.dart';
-import '../component/cart_summary_card.dart';
+import '../../menu/presentation/add_to_cart_bottom_sheet.dart';
 import '../data/cart_manager.dart';
 
 class CartPage extends StatefulWidget {
@@ -134,6 +136,169 @@ class _CartPageState extends State<CartPage> {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class CartEmptyState extends StatelessWidget {
+  const CartEmptyState({super.key, required this.onShop});
+
+  final VoidCallback onShop;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppEmptyState(
+      icon: Icons.shopping_cart_outlined,
+      title: 'Keranjang Belanja Kosong',
+      message: 'Pilih racikan kopi terbaikmu dan tambahkan ke keranjang.',
+      actionLabel: 'Mulai Belanja',
+      onAction: onShop,
+    );
+  }
+}
+
+/// Satu baris keranjang: gambar, nama, varian, harga, pengatur jumlah.
+class CartItemCard extends StatelessWidget {
+  const CartItemCard({
+    super.key,
+    required this.item,
+    required this.onUbahTapped,
+    required this.onQuantityChanged,
+  });
+
+  final CartItem item;
+  final VoidCallback onUbahTapped;
+  final ValueChanged<int> onQuantityChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      radius: 12,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              item.imageAsset,
+              width: 96,
+              height: 96,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0EEE9),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.coffee_rounded,
+                  color: Color(0xFF50453C),
+                  size: 36,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: SizedBox(
+              height: 96,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: onUbahTapped,
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 8, bottom: 2),
+                          child: Text(
+                            'Ubah',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    item.variant,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.bark,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        rupiah(item.price),
+                        style: const TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.espresso,
+                        ),
+                      ),
+                      AppQuantityStepper(
+                        quantity: item.quantity,
+                        onDecrement: () => onQuantityChanged(-1),
+                        onIncrement: () => onQuantityChanged(1),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Ringkasan biaya keranjang (subtotal, pajak, layanan, total).
+class CartSummaryCard extends StatelessWidget {
+  const CartSummaryCard({super.key, required this.cart});
+
+  final CartManager cart;
+
+  @override
+  Widget build(BuildContext context) {
+    return OrderSummaryCard(
+      rows: [
+        SummaryRow('Subtotal', rupiah(cart.subtotal)),
+        SummaryRow('Pajak (11%)', rupiah(cart.tax)),
+        SummaryRow('Biaya Layanan', rupiah(cart.serviceFee)),
+      ],
+      totalLabel: 'Total',
+      totalValue: rupiah(cart.grandTotal),
+      titleFontSize: 15.5,
+      labelFontSize: 13.5,
+      totalFontSize: 18,
     );
   }
 }
