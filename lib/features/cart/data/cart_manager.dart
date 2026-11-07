@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import '../../menu/component/add_to_cart_sheet.dart';
 import '../../menu/data/coffee_item_model.dart';
+import '../../menu/presentation/add_to_cart_bottom_sheet.dart';
 
 class CartItem {
   final String id;

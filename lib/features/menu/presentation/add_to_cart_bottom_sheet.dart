@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/currency.dart';
 import '../../../core/widgets/app_notification.dart';
+import '../../../core/widgets/app_quantity_stepper.dart';
 import '../../cart/data/cart_manager.dart';
 import '../data/coffee_item_model.dart';
-import 'menu_option_controls.dart';
-import 'selected_item_summary_card.dart';
 
 enum CupSize { reguler, large }
 
@@ -239,4 +239,210 @@ Future<void> openAddToCartSheet(BuildContext context, CoffeeItem item) {
       );
     },
   );
+}
+
+/// Pilihan ukuran gelas (Reguler / Large).
+class CupSizeOption extends StatelessWidget {
+  const CupSizeOption({
+    super.key,
+    required this.title,
+    required this.detail,
+    required this.iconSize,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String detail;
+  final double iconSize;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF8B5D39) : const Color(0xFFE5DFD4),
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              Icons.coffee_rounded,
+              size: iconSize,
+              color: isSelected
+                  ? const Color(0xFF2C190D)
+                  : const Color(0xFF5E4B3E),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              detail,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11.5,
+                color: AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Chip tingkat manis (Normal / Less Sugar / No Sugar).
+class SugarLevelChip extends StatelessWidget {
+  const SugarLevelChip({
+    super.key,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.5),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF8B5D39) : const Color(0xFFE5DFD4),
+            width: isSelected ? 1.4 : 1.0,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? AppColors.textDark : const Color(0xFF3C2C20),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Ringkasan produk di dalam sheet "Tambahkan Menu": gambar, nama,
+/// varian, harga, dan pengatur jumlah.
+class SelectedItemSummaryCard extends StatelessWidget {
+  const SelectedItemSummaryCard({
+    super.key,
+    required this.item,
+    required this.variant,
+    required this.totalPrice,
+    required this.quantity,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  final CoffeeItem item;
+  final String variant;
+  final int totalPrice;
+  final int quantity;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+
+  @override
+  Widget build(BuildContext context) {
+    final imageToUse = item.modalImageAsset ?? item.imageAsset;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFECE7DE)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              imageToUse,
+              width: 76,
+              height: 76,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  variant,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      rupiah(totalPrice),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    AppQuantityStepper(
+                      quantity: quantity,
+                      onDecrement: onDecrement,
+                      onIncrement: onIncrement,
+                      width: 88,
+                      height: 32,
+                      iconSize: 15,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
