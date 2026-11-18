@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../config/api_config.dart';
+import '../session/app_session.dart';
 import '../navigation/app_navigation.dart';
 import '../storage/token_storage.dart';
 
@@ -60,6 +61,7 @@ class _AuthInterceptor extends Interceptor {
 
     if (sessionExpired) {
       await TokenStorage.instance.clear();
+      AppSession.reset();
       navigatorKey.currentState?.pushNamedAndRemoveUntil(
         AppRoutes.login,
         (route) => false,

@@ -1,9 +1,10 @@
-  import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
+import '../../../core/session/app_session.dart';
 import '../../../core/storage/token_storage.dart';
-import 'auth_models.dart';
+import '../model/auth_models.dart';
 
 /// Satu-satunya tempat yang tahu alamat endpoint autentikasi.
 /// Halaman (UI) hanya memanggil method di sini dan menangkap ApiException.
@@ -95,7 +96,11 @@ class AuthRepository {
 
   /// Menghapus sesi di perangkat. Bila backend punya endpoint logout,
   /// panggil di sini sebelum menghapus token.
-  Future<void> logout() => TokenStorage.instance.clear();
+  Future<void> logout() async {
+    await TokenStorage.instance.clear();
+    // Pesanan dan keranjang milik pengguna ini tidak boleh terlihat oleh pengguna berikutnya.
+    AppSession.reset();
+  }
 
   Future<AuthResult> _saveSession(Map<String, dynamic> json) async {
     final result = AuthResult.fromJson(json);
