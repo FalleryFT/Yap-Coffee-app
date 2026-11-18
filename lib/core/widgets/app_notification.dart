@@ -104,11 +104,14 @@ class AppNotification {
     );
   }
 
-  static void contactSeller(BuildContext context) {
+  static void contactSeller(
+    BuildContext context, {
+    String outletName = 'Yap Coffee',
+  }) {
     show(
       context,
       title: 'Menghubungi penjual',
-      message: 'Membuka WhatsApp Yap Coffee...',
+      message: 'Membuka WhatsApp $outletName...',
       type: AppNotificationType.contactSeller,
     );
   }
