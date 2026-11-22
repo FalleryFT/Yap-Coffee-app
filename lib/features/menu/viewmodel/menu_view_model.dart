@@ -5,7 +5,6 @@ import '../../../core/session/app_session.dart';
 import '../../../core/viewmodel/load_status.dart';
 import '../data/menu_repository.dart';
 import '../model/coffee_item_model.dart';
-import '../model/menu_options.dart';
 
 /// Katalog menu yang dipakai bersama oleh Home dan Menu, dimuat sekali dari server.
 class MenuViewModel extends ChangeNotifier {
@@ -59,9 +58,6 @@ class MenuViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Ukuran dan tingkat manis yang diatur admin; bawaan sampai katalog termuat.
-  MenuOptions options = MenuOptions.fallback;
-
   bool _busy = false;
 
   /// Satu menu menurut id-nya dari katalog yang sudah dimuat; null bila tidak ada.
@@ -90,7 +86,6 @@ class MenuViewModel extends ChangeNotifier {
       final catalog = await _repository.fetchCatalog();
       items = catalog.items;
       categories = catalog.categories;
-      options = catalog.options;
       // Kategori yang dipilih bisa hilang setelah katalog dimuat ulang.
       if (selectedCategory != allCategories &&
           !categories.contains(selectedCategory)) {
@@ -112,7 +107,6 @@ class MenuViewModel extends ChangeNotifier {
     error = null;
     items = const [];
     categories = const [];
-    options = MenuOptions.fallback;
     selectedCategory = allCategories;
     searchQuery = '';
     notifyListeners();

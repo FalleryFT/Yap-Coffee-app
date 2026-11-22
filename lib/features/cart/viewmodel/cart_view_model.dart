@@ -20,29 +20,35 @@ class CartViewModel extends ChangeNotifier {
       [...addons]..sort((a, b) => a.id.compareTo(b.id));
 
   /// Teks varian yang tampil di keranjang, contoh "Reguler, Less Sugar, Oat Milk".
-  /// Menu tanpa pilihan memakai "Porsi".
+  /// Makanan memakai "Porsi". Minuman yang admin tidak beri pilihan ukuran/manis dan tanpa
+  /// tambahan memakai "Standar". [size] dan [sugar] null bila menu tidak punya pilihan itu.
   static String variantFor(
     CoffeeItem item,
-    SizeOption size,
-    SugarOption sugar, [
+    SizeOption? size,
+    SugarOption? sugar, [
     List<MenuAddon> addons = const [],
   ]) {
     final parts = <String>[
-      if (item.hasOptions) ...[size.label, sugar.label] else 'Porsi',
+      if (!item.hasOptions)
+        'Porsi'
+      else ...[
+        if (size != null) size.label,
+        if (sugar != null) sugar.label,
+      ],
       ..._sorted(addons).map((a) => a.label),
     ];
-    return parts.join(', ');
+    return parts.isEmpty ? 'Standar' : parts.join(', ');
   }
 
   /// Harga satuan: harga menu + tambahan ukuran (hanya menu yang punya pilihan) + semua tambahan.
   /// Sama dengan perhitungan server saat pesanan dibuat.
   static int unitPriceFor(
     CoffeeItem item,
-    SizeOption size, [
+    SizeOption? size, [
     List<MenuAddon> addons = const [],
   ]) {
     final addonTotal = addons.fold<int>(0, (sum, a) => sum + a.extraPrice);
-    return item.price + (item.hasOptions ? size.extraPrice : 0) + addonTotal;
+    return item.price + (item.hasOptions ? (size?.extraPrice ?? 0) : 0) + addonTotal;
   }
 
   /// Keranjang mulai kosong; item hanya masuk saat pengguna menekan '+'.
@@ -77,8 +83,8 @@ class CartViewModel extends ChangeNotifier {
   void addCoffeeItem({
     required CoffeeItem item,
     required int quantity,
-    required SizeOption size,
-    required SugarOption sugar,
+    SizeOption? size,
+    SugarOption? sugar,
     List<MenuAddon> addons = const [],
   }) {
     _hasPressedPlus = true;
@@ -123,8 +129,8 @@ class CartViewModel extends ChangeNotifier {
   /// untuk menu yang sama, kedua baris digabung.
   void updateOptions(
     CartItem item, {
-    required SizeOption size,
-    required SugarOption sugar,
+    SizeOption? size,
+    SugarOption? sugar,
     required List<MenuAddon> addons,
     required int quantity,
   }) {
