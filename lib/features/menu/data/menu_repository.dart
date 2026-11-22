@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../model/coffee_item_model.dart';
-import '../model/menu_options.dart';
 
 /// Satu-satunya jalur HTTP fitur menu: GET /api/menu.
 class MenuRepository {
@@ -20,9 +19,6 @@ class MenuRepository {
         items: (data['items'] as List)
             .map((e) => CoffeeItem.fromApi(e as Map<String, dynamic>))
             .toList(),
-        options: data['options'] is Map<String, dynamic>
-            ? MenuOptions.fromApi(data['options'] as Map<String, dynamic>)
-            : MenuOptions.fallback,
       );
     } on DioException catch (e) {
       throw ApiException.fromDio(e);

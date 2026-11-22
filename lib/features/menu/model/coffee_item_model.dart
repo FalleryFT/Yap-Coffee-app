@@ -62,9 +62,15 @@ class CoffeeItem {
   /// Tambahan yang boleh dipilih pelanggan untuk menu ini.
   final List<MenuAddon> addons;
 
-  /// Minuman (true): pelanggan memilih ukuran dan tingkat manis. Makanan (false): tanpa pilihan.
-  /// Ditentukan admin per kategori, bukan dari nama kategori.
+  /// Minuman (true): boleh punya pilihan ukuran dan tingkat manis. Makanan (false): tanpa pilihan.
+  /// Ditentukan admin lewat Jenis Menu saat menu dibuat, bukan dari nama kategori.
   final bool hasOptions;
+
+  /// Ukuran gelas menu ini (diatur admin per menu). Kosong = tanpa pilihan ukuran.
+  final List<SizeOption> sizes;
+
+  /// Tingkat manis menu ini (diatur admin per menu). Kosong = tanpa pilihan manis.
+  final List<SugarOption> sugarLevels;
 
   const CoffeeItem({
     required this.id,
@@ -83,6 +89,8 @@ class CoffeeItem {
     this.stock,
     this.addons = const [],
     this.hasOptions = true,
+    this.sizes = const [],
+    this.sugarLevels = const [],
   });
 
   /// Dari elemen `items` pada GET /api/menu.
@@ -104,7 +112,56 @@ class CoffeeItem {
           .map((e) => MenuAddon.fromApi(e as Map<String, dynamic>))
           .toList(),
       hasOptions: json['hasOptions'] != false,
+      sizes: ((json['sizes'] as List?) ?? const [])
+          .map((e) => SizeOption.fromApi(e as Map<String, dynamic>))
+          .toList(),
+      sugarLevels: ((json['sugarLevels'] as List?) ?? const [])
+          .map((e) => SugarOption.fromApi(e as Map<String, dynamic>))
+          .toList(),
     );
+  }
+
+  /// Ada pilihan ukuran yang harus dipilih pelanggan.
+  bool get hasSizeChoices => hasOptions && sizes.isNotEmpty;
+
+  /// Ada pilihan tingkat manis yang harus dipilih pelanggan.
+  bool get hasSugarChoices => hasOptions && sugarLevels.isNotEmpty;
+
+  /// Ukuran bawaan; null bila menu ini tanpa pilihan ukuran.
+  SizeOption? get defaultSize {
+    if (!hasSizeChoices) return null;
+    return sizes.firstWhere((s) => s.isDefault, orElse: () => sizes.first);
+  }
+
+  /// Tingkat manis bawaan; null bila menu ini tanpa pilihan manis.
+  SugarOption? get defaultSugar {
+    if (!hasSugarChoices) return null;
+    return sugarLevels.firstWhere((s) => s.isDefault,
+        orElse: () => sugarLevels.first);
+  }
+
+  /// Ukuran dengan nama ini; bila sudah tidak ada (admin mengubah daftar), yang bawaan.
+  SizeOption? sizeByLabel(String? label) {
+    if (!hasSizeChoices) return null;
+    return sizes.firstWhere((s) => s.label == label, orElse: () => defaultSize!);
+  }
+
+  /// Tingkat manis dengan nama ini; bila sudah tidak ada, yang bawaan.
+  SugarOption? sugarByLabel(String? label) {
+    if (!hasSugarChoices) return null;
+    return sugarLevels.firstWhere((s) => s.label == label,
+        orElse: () => defaultSugar!);
+  }
+
+  /// Ringkasan pilihan untuk halaman detail menu; kosong bila menu tanpa pilihan.
+  String get optionsSummary {
+    final lines = <String>[
+      if (hasSizeChoices)
+        'Ukuran: ${sizes.map((s) => s.caption.isEmpty ? s.label : '${s.label} (${s.caption})').join(', ')}.',
+      if (hasSugarChoices)
+        'Tingkat manis: ${sugarLevels.map((s) => s.label).join(', ')}.',
+    ];
+    return lines.join('\n');
   }
 
 
@@ -124,16 +181,13 @@ class CoffeeItem {
 }
 
 /// Isi GET /api/menu: nama kategori dan daftar menu yang tersedia.
+/// Ukuran dan tingkat manis ada di tiap [CoffeeItem].
 class MenuCatalog {
   const MenuCatalog({
     required this.categories,
     required this.items,
-    this.options = MenuOptions.fallback,
   });
 
   final List<String> categories;
   final List<CoffeeItem> items;
-
-  /// Ukuran dan tingkat manis yang diatur admin.
-  final MenuOptions options;
 }

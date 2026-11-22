@@ -5,7 +5,6 @@ import '../../../core/utils/currency.dart';
 import '../../../core/widgets/coffee_image.dart';
 import '../component/add_to_cart_sheet.dart';
 import '../model/coffee_item_model.dart';
-import '../viewmodel/menu_view_model.dart';
 
 /// Detail satu menu: foto besar, nama, harga, deskripsi lengkap, dan tambahan yang tersedia.
 /// Dibuka dengan menyentuh gambar, nama, atau deskripsi pada kartu menu.
@@ -141,12 +140,12 @@ class MenuDetailPage extends StatelessWidget {
                             color: AppColors.bark,
                           ),
                         ),
-                        if (item.hasOptions) ...[
+                        if (item.optionsSummary.isNotEmpty) ...[
                           const SizedBox(height: 22),
                           const _SectionTitle('Pilihan'),
                           const SizedBox(height: 8),
                           Text(
-                            MenuViewModel.instance.options.summary,
+                            item.optionsSummary,
                             style: const TextStyle(
                               fontSize: 13.5,
                               height: 1.5,

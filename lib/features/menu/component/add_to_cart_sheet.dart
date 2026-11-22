@@ -5,7 +5,6 @@ import '../../../core/widgets/app_notification.dart';
 import '../../cart/viewmodel/cart_view_model.dart';
 import '../model/coffee_item_model.dart';
 import '../model/menu_options.dart';
-import '../viewmodel/menu_view_model.dart';
 import 'menu_option_controls.dart';
 import 'selected_item_summary_card.dart';
 
@@ -13,13 +12,14 @@ import 'selected_item_summary_card.dart';
 typedef AddToCartCallback = void Function(
   CoffeeItem item,
   int quantity,
-  SizeOption size,
-  SugarOption sugar,
+  SizeOption? size,
+  SugarOption? sugar,
   List<MenuAddon> addons,
 );
 
 /// Sheet pilihan ukuran, tingkat manis, tambahan, dan jumlah sebelum masuk keranjang.
-/// Ukuran dan tingkat manis mengikuti yang diatur admin (MenuViewModel.options).
+/// Ukuran dan tingkat manis mengikuti yang diatur admin untuk menu ini (CoffeeItem.sizes/sugarLevels);
+/// bagian yang kosong tidak ditampilkan.
 class AddToCartSheet extends StatefulWidget {
   final CoffeeItem item;
   final AddToCartCallback? onAddToCart;
@@ -74,15 +74,13 @@ class AddToCartSheet extends StatefulWidget {
 }
 
 class _AddToCartSheetState extends State<AddToCartSheet> {
-  final MenuOptions _options = MenuViewModel.instance.options;
-
   late int _quantity = widget.initialQuantity;
-  late SizeOption _selectedSize = widget.initialSize == null
-      ? _options.defaultSize
-      : _options.sizeByLabel(widget.initialSize!.label);
-  late SugarOption _selectedSugar = widget.initialSugar == null
-      ? _options.defaultSugar
-      : _options.sugarByLabel(widget.initialSugar!.label);
+  late SizeOption? _selectedSize = widget.initialSize == null
+      ? widget.item.defaultSize
+      : widget.item.sizeByLabel(widget.initialSize!.label);
+  late SugarOption? _selectedSugar = widget.initialSugar == null
+      ? widget.item.defaultSugar
+      : widget.item.sugarByLabel(widget.initialSugar!.label);
   late final Set<int> _selectedAddonIds = {...widget.initialAddonIds};
 
   List<MenuAddon> get _selectedAddons => widget.item.addons
@@ -187,15 +185,15 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
               },
               onIncrement: () => setState(() => _quantity++),
             ),
-            if (widget.item.hasOptions) ...[
+            if (widget.item.hasSizeChoices) ...[
               const SizedBox(height: 22),
               const Text('Pilih Ukuran', style: sectionTitle),
               const SizedBox(height: 10),
               LayoutBuilder(
                 builder: (context, constraints) {
+                  final sizes = widget.item.sizes;
                   // Sampai 3 ukuran sebaris; lebih dari itu dua per baris.
-                  final perRow =
-                      _options.sizes.length <= 3 ? _options.sizes.length : 2;
+                  final perRow = sizes.length <= 3 ? sizes.length : 2;
                   const gap = 12.0;
                   final width =
                       (constraints.maxWidth - gap * (perRow - 1)) / perRow;
@@ -203,17 +201,16 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                     spacing: gap,
                     runSpacing: gap,
                     children: [
-                      for (int i = 0; i < _options.sizes.length; i++)
+                      for (int i = 0; i < sizes.length; i++)
                         SizedBox(
                           width: width,
                           child: CupSizeOption(
-                            title: _options.sizes[i].label,
-                            detail: _options.sizes[i].caption,
+                            title: sizes[i].label,
+                            detail: sizes[i].caption,
                             iconSize: _iconSizeFor(i),
-                            isSelected:
-                                _selectedSize.label == _options.sizes[i].label,
+                            isSelected: _selectedSize?.label == sizes[i].label,
                             onTap: () => setState(
-                              () => _selectedSize = _options.sizes[i],
+                              () => _selectedSize = sizes[i],
                             ),
                           ),
                         ),
@@ -221,6 +218,8 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                   );
                 },
               ),
+            ],
+            if (widget.item.hasSugarChoices) ...[
               const SizedBox(height: 22),
               const Text('Tingkat Manis', style: sectionTitle),
               const SizedBox(height: 10),
@@ -228,10 +227,10 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                 spacing: 10,
                 runSpacing: 10,
                 children: [
-                  for (final sugar in _options.sugarLevels)
+                  for (final sugar in widget.item.sugarLevels)
                     SugarLevelChip(
                       label: sugar.label,
-                      isSelected: _selectedSugar.label == sugar.label,
+                      isSelected: _selectedSugar?.label == sugar.label,
                       onTap: () => setState(() => _selectedSugar = sugar),
                     ),
                 ],
