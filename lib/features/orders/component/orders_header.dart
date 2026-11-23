@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_logo.dart';
 
 class OrdersHeader extends StatelessWidget {
   const OrdersHeader({super.key});
@@ -14,14 +15,9 @@ class OrdersHeader extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
-              child: Image.asset(
-                'assets/images/app_emblem.png',
-                width: 36,
-                height: 36,
-                fit: BoxFit.contain,
-              ),
+              child: AppEmblem(size: 38),
             ),
             const Text(
               'Pesanan Saya',

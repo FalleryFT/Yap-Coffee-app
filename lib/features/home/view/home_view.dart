@@ -14,7 +14,6 @@ import '../component/home_hero_card.dart';
 import '../component/home_logo_app_bar.dart';
 import '../component/home_section_header.dart';
 import '../viewmodel/home_view_model.dart';
-import '../../chat/component/chat_draggable_fab.dart';
 
 class HomeView extends StatefulWidget {
   final VoidCallback onSeeAllTapped;
@@ -53,116 +52,127 @@ class _HomeViewState extends State<HomeView> {
 
         return Scaffold(
           backgroundColor: AppColors.cream,
-          body: Stack(
-            children: [
-              SafeArea(
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    const SliverToBoxAdapter(child: HomeLogoAppBar()),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Header logo + lonceng: tetap di atas saat konten di-scroll.
+                const HomeLogoAppBar(),
 
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        child: HomeHeroCard(
-                          firstName: _home.firstName,
-                          instagram: _home.instagramHandle,
-                        ),
-                      ),
-                    ),
-
-                    if (readyOrder != null)
+                Expanded(
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
-                            vertical: 6,
+                            vertical: 8,
                           ),
-                          child: HomeActiveOrderCard(
-                            order: readyOrder,
-                            onAmbilTapped: () => _openReadyOrder(readyOrder),
+                          child: HomeHeroCard(
+                            firstName: _home.firstName,
+                            instagram: _home.instagramHandle,
                           ),
                         ),
                       ),
 
-                    SliverToBoxAdapter(
-                      child: AppFilterChips(
-                        categories: _home.categoryChips,
-                        selectedCategory: _home.selectedCategory,
-                        onCategorySelected: _home.selectCategory,
-                        inactiveColor: const Color(0xFFEBE6DF),
-                        inactiveBorderColor: const Color(0xFFD5CEBF),
-                        inactiveTextColor: const Color(0xFF3A2414),
-                      ),
-                    ),
+                      if (readyOrder != null)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 6,
+                            ),
+                            child: HomeActiveOrderCard(
+                              order: readyOrder,
+                              onAmbilTapped: () => _openReadyOrder(readyOrder),
+                            ),
+                          ),
+                        ),
 
-                    SliverToBoxAdapter(
-                      child: HomeSectionHeader(
-                        title: 'Menu Favorit Tetangga',
-                        onActionTapped: widget.onSeeAllTapped,
-                      ),
-                    ),
-
-                    if (_home.listStatus == LoadStatus.error)
                       SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                          child: Column(
-                            children: [
-                              Text(
-                                _home.listError,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: AppColors.bark),
-                              ),
-                              TextButton(
-                                onPressed: _home.retry,
-                                child: const Text('Coba Lagi'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    else if (_home.listStatus != LoadStatus.ready)
-                      const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 32),
-                          child: Center(
-                            child: CircularProgressIndicator(color: AppColors.espresso),
-                          ),
+                        child: AppFilterChips(
+                          categories: _home.categoryChips,
+                          selectedCategory: _home.selectedCategory,
+                          onCategorySelected: _home.selectCategory,
+                          inactiveColor: const Color(0xFFEBE6DF),
+                          inactiveBorderColor: const Color(0xFFD5CEBF),
+                          inactiveTextColor: const Color(0xFF3A2414),
                         ),
                       ),
 
-                    SliverPadding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 90),
-                      sliver: SliverGrid(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisExtent: 300,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 14,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final item = items[index];
-                            return AppMenuCard(
-                              item: item,
-                              onTap: () => MenuDetailPage.open(context, item),
-                              onAdd: () => openAddToCartSheet(context, item),
-                            );
-                          },
-                          childCount: items.length,
+                      SliverToBoxAdapter(
+                        child: HomeSectionHeader(
+                          title: 'Menu Favorit Tetangga',
+                          onActionTapped: widget.onSeeAllTapped,
                         ),
                       ),
-                    ),
-                  ],
+
+                      if (_home.listStatus == LoadStatus.error)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 24,
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  _home.listError,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(color: AppColors.bark),
+                                ),
+                                TextButton(
+                                  onPressed: _home.retry,
+                                  child: const Text('Coba Lagi'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else if (_home.listStatus != LoadStatus.ready)
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 32),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.espresso,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      SliverPadding(
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          right: 20,
+                          bottom: 90,
+                        ),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisExtent: 300,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 14,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final item = items[index];
+                              return AppMenuCard(
+                                item: item,
+                                onTap: () => MenuDetailPage.open(context, item),
+                                onAdd: () => openAddToCartSheet(context, item),
+                              );
+                            },
+                            childCount: items.length,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-              // Tombol chat melayang di atas tombol keranjang. Tekan lama lalu
-              // geser untuk memindahkannya; posisi awalnya sejajar tombol
-              // keranjang di MainShellPage (right 18, bottom 80, ukuran 52x52).
-              const ChatDraggableFab(),
-            ],
+              ],
+            ),
           ),
         );
       },
