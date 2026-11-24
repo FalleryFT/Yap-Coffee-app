@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-import '../../../core/config/api_config.dart';
 import '../../../core/network/api_exception.dart';
 import '../../auth/data/auth_repository.dart';
 import '../data/profile_repository.dart';
@@ -102,8 +101,7 @@ class ProfileViewModel extends ChangeNotifier {
 
       if (pickedAvatar != null) {
         final user = await _repository.uploadAvatar(pickedAvatar);
-        savedAvatarUrl =
-            user.avatar == null ? null : ApiConfig.avatarUrl(user.avatar!);
+        savedAvatarUrl = user.avatar;
       } else if (removeAvatar && avatarUrl != null) {
         await _repository.removeAvatar();
         savedAvatarUrl = null;

@@ -1,17 +1,11 @@
 import 'menu_options.dart';
 import '../../../core/config/api_config.dart';
 
-/// Foto yang diunggah admin diberi nama UUID oleh server; foto bawaan aplikasi
-/// (yap_latte.png dan sebagainya) dimuat dari assets.
-final RegExp _uploadedName = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-');
-
-/// Menentukan sumber gambar dari nama berkas yang dikirim API.
-/// [asset] kosong berarti tidak ada gambar (tampil ikon pengganti).
+/// Menentukan sumber gambar dari nilai yang dikirim API.
+/// [asset] kosong berarti tidak ada gambar lokal (memakai [url] atau ikon pengganti).
 ({String asset, String? url}) resolveMenuImage(String? image) {
   if (image == null || image.isEmpty) return (asset: '', url: null);
-  if (_uploadedName.hasMatch(image)) {
-    return (asset: '', url: ApiConfig.menuImageUrl(image));
-  }
+  if (ApiConfig.isRemoteImage(image)) return (asset: '', url: image);
   return (asset: 'assets/images/$image', url: null);
 }
 
@@ -163,7 +157,6 @@ class CoffeeItem {
     ];
     return lines.join('\n');
   }
-
 
   String get formattedPrice {
     final str = price.toString();

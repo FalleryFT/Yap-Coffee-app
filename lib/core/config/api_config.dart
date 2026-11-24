@@ -21,17 +21,8 @@ class ApiConfig {
     return 'http://localhost:4000/api';
   }
 
-  /// Alamat server tanpa akhiran /api, dipakai untuk berkas statis seperti foto menu.
-  static String get origin {
-    final base = baseUrl;
-    return base.endsWith('/api') ? base.substring(0, base.length - 4) : base;
-  }
-
-  /// URL foto menu yang diunggah admin, contoh: http://10.0.2.2:4000/uploads/menu/<berkas>
-  static String menuImageUrl(String filename) => '$origin/uploads/menu/$filename';
-
-  /// URL foto profil pelanggan, contoh: http://10.0.2.2:4000/uploads/avatars/<berkas>
-  static String avatarUrl(String filename) => '$origin/uploads/avatars/$filename';
+  static bool isRemoteImage(String? value) =>
+      value != null && (value.startsWith('https://') || value.startsWith('http://'));
 
   static const Duration timeout = Duration(seconds: 15);
 }
