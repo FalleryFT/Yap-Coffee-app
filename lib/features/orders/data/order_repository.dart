@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../model/order_model.dart';
+import '../../payment/model/snap_session.dart';
 
 /// Satu-satunya jalur HTTP fitur pesanan: daftar, detail, buat, bayar, batal.
 class OrderRepository {
@@ -45,7 +46,11 @@ class OrderRepository {
       return OrderModel.fromJson(res.data!['data'] as Map<String, dynamic>);
     });
   }
-
+  /// Membuat sesi pembayaran Midtrans (Snap) untuk pesanan yang belum dibayar.
+  Future<SnapSession> createSnap(String code) => _guard(() async {
+        final res = await _dio.post<Map<String, dynamic>>('/orders/$code/snap');
+        return SnapSession.fromJson(res.data!['data'] as Map<String, dynamic>);
+      });
   /// Pelunasan simulasi (server harus PAYMENT_SIMULATED=true).
   Future<OrderModel> pay(String code) => _guard(() async {
         final res = await _dio.post<Map<String, dynamic>>('/orders/$code/pay');

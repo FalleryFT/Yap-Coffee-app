@@ -20,10 +20,12 @@ class ApiClient {
         ) {
     dio.interceptors.add(_AuthInterceptor());
 
-    // Body sengaja tidak dicatat: isinya memuat kata sandi dan token.
+    // Body permintaan sengaja tidak dicatat: isinya memuat kata sandi dan token.
     if (kDebugMode) {
       dio.interceptors.add(
-        LogInterceptor(requestBody: false, responseBody: false),
+        // UBAH: responseBody true hanya sementara untuk melihat isi galat 422.
+        // Kembalikan ke false setelah selesai, karena respons login memuat token.
+        LogInterceptor(requestBody: false, responseBody: true),
       );
     }
   }
