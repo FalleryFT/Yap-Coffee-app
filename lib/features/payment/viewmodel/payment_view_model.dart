@@ -8,8 +8,9 @@ import '../../home/viewmodel/home_view_model.dart';
 import '../../orders/data/order_repository.dart';
 import '../../orders/model/order_model.dart';
 import '../../orders/viewmodel/order_view_model.dart';
+import '../model/snap_session.dart';
 
-/// State halaman pembayaran: hitung mundur, pengecekan status berkala, dan pelunasan.
+/// State halaman pembayaran: hitung mundur, pengecekan status berkala, dan pembuatan sesi Midtrans.
 /// Halaman hanya menampilkan state ini lalu mengurus navigasi dan snackbar.
 class PaymentViewModel extends ChangeNotifier {
   PaymentViewModel({
@@ -41,7 +42,13 @@ class PaymentViewModel extends ChangeNotifier {
   DateTime _deadline;
 
   String customerName = '';
-  bool paying = false;
+
+  /// Sedang meminta sesi pembayaran (Snap) ke server.
+  bool openingSnap = false;
+
+  /// Sedang memastikan hasil pembayaran ke server setelah WebView ditutup.
+  bool confirming = false;
+
   bool refreshing = false;
 
   /// Waktu pembayaran habis dan pesanan dibatalkan server; halaman perlu menutup diri.
@@ -93,7 +100,7 @@ class PaymentViewModel extends ChangeNotifier {
       }
       _notify();
     });
-    // Pelunasan lewat penyedia pembayaran terjadi di luar aplikasi, jadi status dicek berkala.
+    // Pelunasan terjadi di Midtrans (di luar aplikasi), jadi status dicek berkala.
     _poller = Timer.periodic(pollInterval, (_) => refresh());
   }
 
@@ -163,21 +170,43 @@ class PaymentViewModel extends ChangeNotifier {
     _notify();
   }
 
-  /// Pelunasan simulasi untuk uji coba (server PAYMENT_SIMULATED=true).
-  Future<void> pay() async {
-    if (paying) return;
-    paying = true;
+  /// Meminta sesi pembayaran Midtrans. Null bila gagal (pesan galat ada di [errorMessage]).
+  Future<SnapSession?> prepareSnap() async {
+    if (openingSnap || confirming) return null;
+    openingSnap = true;
     errorMessage = null;
     _notify();
     try {
-      final paidOrder = await _repository.pay(_order.id);
-      _applyOrder(paidOrder);
+      return await _repository.createSnap(_order.id);
     } on ApiException catch (e) {
       errorMessage = e.message;
       // Status di server bisa lebih baru (mis. sudah lunas atau kedaluwarsa).
       if (e.statusCode == 409) refresh();
+      return null;
     } finally {
-      paying = false;
+      openingSnap = false;
+      _notify();
+    }
+  }
+
+  /// Dipanggil halaman setelah WebView ditutup.
+  /// [finished] true bila Midtrans mengarahkan ke finish URL: webhook bisa terlambat beberapa
+  /// detik, jadi status ditanyakan beberapa kali sampai berubah.
+  Future<void> confirmAfterWebView({required bool finished}) async {
+    if (!finished) {
+      await refresh();
+      return;
+    }
+    confirming = true;
+    _notify();
+    try {
+      for (var i = 0; i < 8 && !_disposed; i++) {
+        await refresh();
+        if (paid || cancelled) break;
+        await Future<void>.delayed(const Duration(seconds: 2));
+      }
+    } finally {
+      confirming = false;
       _notify();
     }
   }

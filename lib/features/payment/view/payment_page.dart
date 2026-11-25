@@ -1,14 +1,18 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/external_links.dart';
 import '../../../core/widgets/app_notification.dart';
 import '../../orders/model/order_model.dart';
 import '../component/payment_deadline_card.dart';
-import '../component/payment_qr_box.dart';
+import '../component/payment_method_box.dart';
 import '../component/payment_status_card.dart';
 import '../component/payment_summary_card.dart';
 import '../component/payment_ticket_card.dart';
+import '../model/snap_session.dart';
 import '../viewmodel/payment_view_model.dart';
+import 'payment_webview_page.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key, required this.order});
@@ -65,6 +69,66 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
+  // ------------------------------------------------------------ Pembayaran
+
+  /// Membuka halaman bayar Midtrans, lalu memastikan hasilnya ke server.
+  Future<void> _pay() async {
+    final session = await _payment.prepareSnap();
+    if (session == null || !mounted) return;
+
+    // WebView tidak tersedia di web, jadi Midtrans dibuka di tab baru.
+    if (kIsWeb) {
+      await _payOnWeb(session);
+      return;
+    }
+
+    final finished = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => PaymentWebViewPage(session: session),
+      ),
+    );
+    if (!mounted) return;
+    await _payment.confirmAfterWebView(finished: finished ?? false);
+  }
+
+  /// Di web, tab baru harus dibuka dari ketukan langsung pengguna agar tidak diblokir
+  /// pop-up blocker. Karena itu tombol ada di dialog, bukan dipanggil otomatis setelah
+  /// permintaan ke server. Status pesanan diperbarui oleh pengecekan berkala ViewModel.
+  Future<void> _payOnWeb(SnapSession session) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Lanjutkan pembayaran'),
+        content: const Text(
+          'Halaman pembayaran Midtrans akan dibuka di tab baru. '
+          'Setelah selesai, kembali ke tab ini. Status pesanan diperbarui otomatis.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final opened = await openExternalUrl(session.redirectUrl);
+              if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+              if (!opened && mounted) {
+                AppNotification.error(
+                  context,
+                  'Halaman pembayaran tidak bisa dibuka. Izinkan pop-up untuk situs ini.',
+                );
+              }
+            },
+            child: const Text('Buka Halaman Pembayaran'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- Tampilan
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -115,17 +179,27 @@ class _PaymentPageState extends State<PaymentPage> {
         PaymentTicketCard(
           queueNumber: _payment.order.id,
           customerName: _payment.customerName,
-          child: const PaymentQrBox(),
+          child: const PaymentMethodBox(),
         ),
         const SizedBox(height: 24),
-        Center(child: _buildDownloadButton()),
+        Center(child: _buildPayButton()),
+        if (_payment.confirming) ...[
+          const SizedBox(height: 12),
+          const Center(
+            child: Text(
+              'Memeriksa pembayaran…',
+              style: TextStyle(fontSize: 12.5, color: AppColors.bark),
+            ),
+          ),
+        ],
         const SizedBox(height: 24),
         PaymentSummaryCard(orderLines: _payment.orderLines),
       ],
     );
   }
 
-  Widget _buildDownloadButton() {
+  Widget _buildPayButton() {
+    final busy = _payment.openingSnap || _payment.confirming;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -138,7 +212,7 @@ class _PaymentPageState extends State<PaymentPage> {
         ],
       ),
       child: FilledButton(
-        onPressed: _payment.paying ? null : _payment.pay,
+        onPressed: busy ? null : _pay,
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.buttonDark,
           foregroundColor: Colors.white,
@@ -148,12 +222,12 @@ class _PaymentPageState extends State<PaymentPage> {
           ),
           textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Bayar (Simulasi)'),
-            SizedBox(width: 10),
-            Icon(Icons.qr_code_2_rounded, size: 16),
+            Text(_payment.openingSnap ? 'Menyiapkan…' : 'Bayar Sekarang'),
+            const SizedBox(width: 10),
+            const Icon(Icons.payment_rounded, size: 16),
           ],
         ),
       ),

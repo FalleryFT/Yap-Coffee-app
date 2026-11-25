@@ -14,7 +14,7 @@ class ChatViewModel extends ChangeNotifier {
     const ChatMessage(
       role: ChatRole.bot,
       text:
-          'Halo! Saya asisten Yap Coffee. Mau tanya soal menu, pemesanan, atau pengambilan?',
+          'Halo! Saya asisten Yap Coffee nama saya yanto. Mau tanya soal menu, pemesanan, atau pengambilan?',
       includeInHistory: false,
     ),
   ];
