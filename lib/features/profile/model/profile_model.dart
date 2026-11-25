@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../../../core/config/api_config.dart';
 import '../../../core/utils/date_labels.dart';
 import '../../../core/utils/validators.dart';
 import '../../auth/model/auth_models.dart';
@@ -38,7 +37,7 @@ class ProfileModel {
       joinedLabel: DateLabels.joined(user.createdAt),
       passwordUpdatedLabel: DateLabels.passwordUpdated(user.passwordUpdatedAt),
       avatarBytes: avatarBytes,
-      avatarUrl: user.avatar == null ? null : ApiConfig.avatarUrl(user.avatar!),
+      avatarUrl: user.avatar,
     );
   }
 

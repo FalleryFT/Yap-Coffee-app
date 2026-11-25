@@ -124,6 +124,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+  /// Tombol kembali di pojok kanan atas; header tetap terlihat saat form di-scroll.
+  Widget _backAction() {
+    return Semantics(
+      button: true,
+      label: 'Kembali',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _profile.loading ? null : () => Navigator.of(context).pop(),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.cardLine),
+          ),
+          child: const Icon(
+            Icons.close_rounded,
+            size: 22,
+            color: AppColors.textDark,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -131,60 +157,69 @@ class _EditProfilePageState extends State<EditProfilePage> {
       builder: (context, _) => Scaffold(
         backgroundColor: AppColors.cream,
         body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: Column(
-              children: [
-                AppPageHeader(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: AppPageHeader(
                   title: 'Edit Profile',
                   icon: Icons.person_outline_rounded,
                   onBack: () => Navigator.of(context).pop(),
+                  trailing: _backAction(),
                 ),
-                const SizedBox(height: 20),
-                AvatarPickerSection(
-                  assetPath: widget.profile.avatarAsset,
-                  imageBytes: _avatarBytes,
-                  imageUrl: _removeAvatar ? null : _avatarUrl,
-                  onTap: _showImagePickerOptions,
-                ),
-                const SizedBox(height: 22),
-                EditProfileFormCard(
-                  formKey: _formKey,
-                  name: _name,
-                  phone: _phone,
-                  email: _email,
-                  serverError: _profile.serverError,
-                  clearServerError: _profile.clearServerError,
-                ),
-                const SizedBox(height: 14),
-                SecurityAccountCard(
-                  joinedLabel: widget.profile.joinedLabel,
-                  passwordUpdatedLabel: _passwordLabel,
-                  onChangePassword: _openChangePassword,
-                ),
-                const SizedBox(height: 22),
-                PrimaryButton(
-                  label: 'Simpan Perubahan',
-                  loading: _profile.loading,
-                  onPressed: _save,
-                ),
-                const SizedBox(height: 6),
-                TextButton(
-                  onPressed: _profile.loading
-                      ? null
-                      : () => Navigator.of(context).pop(),
-                  child: const Text(
-                    'Batal',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textDark,
-                    ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+                  child: Column(
+                    children: [
+                      AvatarPickerSection(
+                        assetPath: widget.profile.avatarAsset,
+                        imageBytes: _avatarBytes,
+                        imageUrl: _removeAvatar ? null : _avatarUrl,
+                        onTap: _showImagePickerOptions,
+                      ),
+                      const SizedBox(height: 22),
+                      EditProfileFormCard(
+                        formKey: _formKey,
+                        name: _name,
+                        phone: _phone,
+                        email: _email,
+                        serverError: _profile.serverError,
+                        clearServerError: _profile.clearServerError,
+                      ),
+                      const SizedBox(height: 14),
+                      SecurityAccountCard(
+                        joinedLabel: widget.profile.joinedLabel,
+                        passwordUpdatedLabel: _passwordLabel,
+                        onChangePassword: _openChangePassword,
+                      ),
+                      const SizedBox(height: 22),
+                      PrimaryButton(
+                        label: 'Simpan Perubahan',
+                        loading: _profile.loading,
+                        onPressed: _save,
+                      ),
+                      const SizedBox(height: 6),
+                      TextButton(
+                        onPressed: _profile.loading
+                            ? null
+                            : () => Navigator.of(context).pop(),
+                        child: const Text(
+                          'Batal',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

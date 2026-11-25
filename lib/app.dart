@@ -50,6 +50,14 @@ class YapCoffeeApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       initialRoute: initialRoute,
       onGenerateRoute: _onGenerateRoute,
+      // Sentuh area kosong di halaman mana pun untuk menutup keyboard.
+      // Tombol, kolom teks, dan daftar yang bisa di-scroll tetap bekerja
+      // normal karena gesture anak selalu menang atas gesture ini.
+      builder: (context, child) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: child,
+      ),
     );
   }
 }

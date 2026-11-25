@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_logo.dart';
 import '../../../core/widgets/app_notification.dart';
 import '../../cart/view/cart_page.dart';
 import '../../cart/viewmodel/cart_view_model.dart';
@@ -13,7 +14,7 @@ import '../../notifications/viewmodel/notification_view_model.dart';
 import '../../orders/viewmodel/order_view_model.dart';
 import '../../orders/view/orders_page.dart';
 import '../../profile/view/profile_page.dart';
-import '../component/floating_cart_button.dart';
+import '../component/floating_buttons_layer.dart';
 import '../component/main_bottom_nav_bar.dart';
 import '../viewmodel/home_view_model.dart';
 import 'home_view.dart';
@@ -120,17 +121,18 @@ class _MainShellPageState extends State<MainShellPage>
               ],
             ),
 
-            // Floating Cart Button (shown on Home and Menu screens only when plus has been tapped)
-            if ((_currentIndex == 0 || _currentIndex == 1) &&
-                _cart.isCartButtonVisible)
-              Positioned(
-                right: 18,
-                bottom: 80,
-                child: FloatingCartButton(
-                  itemCount: _cart.totalItemCount,
-                  onTap: _openCartPage,
-                ),
-              ),
+            // Tombol keranjang (hanya Home dan Menu, setelah tombol plus
+            // ditekan) dan tombol chat AI (semua tab utama). Batas atasnya
+            // mengikuti tinggi header tab yang sedang aktif. Halaman detail
+            // yang di-push menutupi shell ini, sehingga tombolnya otomatis
+            // hilang di sana.
+            FloatingButtonsLayer(
+              showCart: (_currentIndex == 0 || _currentIndex == 1) &&
+                  _cart.isCartButtonVisible,
+              cartItemCount: _cart.totalItemCount,
+              onCartTap: _openCartPage,
+              topReserved: AppHeaderMetrics.forTab(_currentIndex),
+            ),
           ],
         ),
       ),

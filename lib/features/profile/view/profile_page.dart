@@ -5,6 +5,7 @@ import '../../../core/navigation/app_navigation.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_empty_state.dart';
+import '../../../core/widgets/app_logo.dart';
 import '../../../core/widgets/app_notification.dart';
 import '../../home/component/store_links.dart';
 import '../../notifications/viewmodel/notification_view_model.dart';
@@ -101,75 +102,84 @@ class _ProfilePageState extends State<ProfilePage> {
           body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              padding: const EdgeInsets.fromLTRB(18, 8, 20, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    'assets/images/app_logo.png',
-                    height: 28,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 18),
-                  ProfileUserCard(profile: profile),
-                  const SizedBox(height: 22),
-                  ProfileMenuSection(
-                    title: 'Pengaturan Akun',
-                    children: [
-                      ProfileMenuRow(
-                        icon: Icons.person_outline_rounded,
-                        label: 'Edit Profil',
-                        trailing: const Icon(
-                          Icons.chevron_right_rounded,
-                          color: AppColors.bark,
-                        ),
-                        onTap: _openEditProfile,
-                      ),
-                    ],
+                  const AppLogo(),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: ProfileUserCard(profile: profile),
                   ),
                   const SizedBox(height: 22),
-                  ProfileMenuSection(
-                    title: 'Preferensi Aplikasi',
-                    children: [
-                      ProfileMenuRow(
-                        icon: Icons.notifications_none_rounded,
-                        label: 'Notifikasi',
-                        trailing: Switch(
-                          value: _notifications.enabled,
-                          onChanged: _setNotifications,
-                          activeThumbColor: Colors.white,
-                          activeTrackColor: const Color(0xFF55612E),
-                          inactiveThumbColor: Colors.white,
-                          inactiveTrackColor: const Color(0xFFD5CEBF),
-                          trackOutlineColor:
-                              const WidgetStatePropertyAll(Colors.transparent),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: ProfileMenuSection(
+                      title: 'Pengaturan Akun',
+                      children: [
+                        ProfileMenuRow(
+                          icon: Icons.person_outline_rounded,
+                          label: 'Edit Profil',
+                          trailing: const Icon(
+                            Icons.chevron_right_rounded,
+                            color: AppColors.bark,
+                          ),
+                          onTap: _openEditProfile,
                         ),
-                        onTap: () =>
-                            _setNotifications(!_notifications.enabled),
-                      ),
-                      const Divider(
-                        height: 1,
-                        indent: 12,
-                        endIndent: 12,
-                        color: Color(0xFFECE7DE),
-                      ),
-                      ProfileMenuRow(
-                        iconWidget: const FaIcon(
-                          FontAwesomeIcons.whatsapp,
-                          size: 21,
-                          color: AppColors.textDark,
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: ProfileMenuSection(
+                      title: 'Preferensi Aplikasi',
+                      children: [
+                        ProfileMenuRow(
+                          icon: Icons.notifications_none_rounded,
+                          label: 'Notifikasi',
+                          trailing: Switch(
+                            value: _notifications.enabled,
+                            onChanged: _setNotifications,
+                            activeThumbColor: Colors.white,
+                            activeTrackColor: const Color(0xFF55612E),
+                            inactiveThumbColor: Colors.white,
+                            inactiveTrackColor: const Color(0xFFD5CEBF),
+                            trackOutlineColor: const WidgetStatePropertyAll(
+                              Colors.transparent,
+                            ),
+                          ),
+                          onTap: () =>
+                              _setNotifications(!_notifications.enabled),
                         ),
-                        label: 'Hubungi Penjual',
-                        trailing: const Icon(
-                          Icons.chevron_right_rounded,
-                          color: AppColors.bark,
+                        const Divider(
+                          height: 1,
+                          indent: 12,
+                          endIndent: 12,
+                          color: Color(0xFFECE7DE),
                         ),
-                        onTap: () => StoreLinks.openWhatsapp(context),
-                      ),
-                    ],
+                        ProfileMenuRow(
+                          iconWidget: const FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            size: 21,
+                            color: AppColors.textDark,
+                          ),
+                          label: 'Hubungi Penjual',
+                          trailing: const Icon(
+                            Icons.chevron_right_rounded,
+                            color: AppColors.bark,
+                          ),
+                          onTap: () => StoreLinks.openWhatsapp(context),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
-                  ProfileLogoutButton(onPressed: _logout),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: ProfileLogoutButton(onPressed: _logout),
+                  ),
                 ],
               ),
             ),
