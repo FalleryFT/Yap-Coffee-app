@@ -52,46 +52,55 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         return Scaffold(
           backgroundColor: AppColors.cream,
           body: SafeArea(
-            child: RefreshIndicator(
-              color: AppColors.espresso,
-              onRefresh: _orders.load,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
+            // Header dipisah dari area scroll supaya tetap terlihat saat halaman digeser.
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  child: OrderDetailTopBar(
+                    orderId: order.id,
+                    onBack: () => Navigator.of(context).pop(),
+                  ),
                 ),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                child: Column(
-                  children: [
-                    OrderDetailTopBar(
-                      orderId: order.id,
-                      onBack: () => Navigator.of(context).pop(),
-                    ),
-                    const SizedBox(height: 16),
-                    OrderStatusTracker(status: order.status),
-                    const SizedBox(height: 14),
-                    OrderItemsSummaryCard(order: order),
-                    const SizedBox(height: 14),
-                    PickupInfoCard(order: order),
-                    const SizedBox(height: 14),
-                    PickupMapCard(
-                      routeGuide: order.routeGuide,
-                      latitude: order.latitude,
-                      longitude: order.longitude,
-                      onOpenMaps: () => _openMaps(order),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Harap sebutkan nama atau nomor pesanan saat\npengambilan.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        color: AppColors.textMuted,
-                        height: 1.4,
+                Expanded(
+                  child: RefreshIndicator(
+                    color: AppColors.espresso,
+                    onRefresh: _orders.load,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      child: Column(
+                        children: [
+                          OrderStatusTracker(status: order.status),
+                          const SizedBox(height: 14),
+                          OrderItemsSummaryCard(order: order),
+                          const SizedBox(height: 14),
+                          PickupInfoCard(order: order),
+                          const SizedBox(height: 14),
+                          PickupMapCard(
+                            routeGuide: order.routeGuide,
+                            latitude: order.latitude,
+                            longitude: order.longitude,
+                            onOpenMaps: () => _openMaps(order),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Harap sebutkan nama atau nomor pesanan saat\npengambilan.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.textMuted,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         );

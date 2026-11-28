@@ -25,7 +25,9 @@ class ActiveOrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                OrderStatusChip(status: order.status),
+                // Chip status boleh menyusut; nomor pesanan tetap utuh.
+                Flexible(child: OrderStatusChip(status: order.status)),
+                const SizedBox(width: 8),
                 Text(
                   '#${order.id}',
                   style: const TextStyle(

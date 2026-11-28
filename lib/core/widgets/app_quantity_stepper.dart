@@ -40,12 +40,19 @@ class AppQuantityStepper extends StatelessWidget {
             size: iconSize,
             onTap: onDecrement,
           ),
-          Text(
-            '$quantity',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ink,
+          // Angka jumlah mengecil bila perlu; ukuran stepper sendiri tetap.
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                '$quantity',
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
+              ),
             ),
           ),
           _StepperButton(icon: Icons.add, size: iconSize, onTap: onIncrement),

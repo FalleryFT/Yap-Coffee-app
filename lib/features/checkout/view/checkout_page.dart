@@ -125,6 +125,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           title: const Text(
             'Checkout Pre-Order',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: AppColors.espresso,
               fontSize: 20,

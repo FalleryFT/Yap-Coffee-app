@@ -28,57 +28,74 @@ class PickupMapCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.circle, size: 9, color: Color(0xFF1DB87A)),
-                  SizedBox(width: 8),
-                  Text(
-                    'Peta Titik Pengambilan',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                ],
-              ),
-              GestureDetector(
-                onTap: onOpenMaps,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5EBE0),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE6D3C0)),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Buka di Google Maps',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+          // Judul + tombol: Wrap selebar kartu, jadi saat teks diperbesar
+          // tombol turun ke baris berikutnya alih-alih terpotong.
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.circle, size: 9, color: Color(0xFF1DB87A)),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'Peta Titik Pengambilan',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textDark,
                         ),
                       ),
-                      SizedBox(width: 4),
-                      Icon(
-                        Icons.open_in_new_rounded,
-                        size: 12,
-                        color: AppColors.textDark,
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: onOpenMaps,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5EBE0),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFE6D3C0)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Buka di Google Maps',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          size: 12,
+                          color: AppColors.textDark,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           if (latitude != null && longitude != null)
@@ -142,18 +159,26 @@ class PickupMapCard extends StatelessWidget {
           const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
-            height: 50,
             child: ElevatedButton.icon(
               onPressed: onOpenMaps,
               icon: const Icon(Icons.send_rounded, size: 18),
               label: const Text(
                 'Buka Penunjuk Arah (Navigasi Maps)',
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.buttonDark,
                 foregroundColor: Colors.white,
                 elevation: 0,
+                // Tinggi mengikuti teks: label bisa dua baris saat font besar.
+                minimumSize: const Size(0, 50),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -173,9 +198,11 @@ class _MapUnavailable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      // Tinggi minimum saja: teks yang membesar menambah tinggi kotak,
+      // bukan terpotong keluar.
+      constraints: const BoxConstraints(minHeight: 120),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF5EFE6),
         borderRadius: BorderRadius.circular(14),

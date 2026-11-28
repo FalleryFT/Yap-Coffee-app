@@ -147,6 +147,8 @@ class _PaymentPageState extends State<PaymentPage> {
           // Nama outlet dari pengaturan admin; 'Yap Coffee' selama belum termuat.
           title: Text(
             _payment.storeName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: AppColors.espresso,
               fontSize: 20,

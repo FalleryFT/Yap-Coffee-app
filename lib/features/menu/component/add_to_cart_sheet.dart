@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../core/widgets/app_notification.dart';
 import '../../cart/viewmodel/cart_view_model.dart';
 import '../model/coffee_item_model.dart';
@@ -56,15 +57,20 @@ class AddToCartSheet extends StatefulWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => AddToCartSheet(
-        item: item,
-        onAddToCart: onAddToCart,
-        initialQuantity: initialQuantity,
-        initialSize: initialSize,
-        initialSugar: initialSugar,
-        initialAddonIds: initialAddonIds,
-        confirmLabel: confirmLabel,
+      // Lebar sheet mengikuti konten aplikasi (maks 480), bukan lebar jendela.
+      builder: (_) => ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AppLayout.maxContentWidth),
+        child: AddToCartSheet(
+          item: item,
+          onAddToCart: onAddToCart,
+          initialQuantity: initialQuantity,
+          initialSize: initialSize,
+          initialSugar: initialSugar,
+          initialAddonIds: initialAddonIds,
+          confirmLabel: confirmLabel,
+        ),
       ),
     );
   }
@@ -152,14 +158,19 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Tambahkan Menu',
-                  style: TextStyle(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
+                const Expanded(
+                  child: Text(
+                    'Tambahkan Menu',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   behavior: HitTestBehavior.opaque,

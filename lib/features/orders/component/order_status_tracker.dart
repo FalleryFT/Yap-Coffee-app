@@ -55,14 +55,19 @@ class OrderStatusTracker extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Status Pesanan',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
+              const Expanded(
+                child: Text(
+                  'Status Pesanan',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               OrderStatusChip(status: status),
             ],
           ),

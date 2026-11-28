@@ -35,13 +35,18 @@ class MainBottomNavBar extends StatelessWidget {
             ? MediaQuery.of(context).padding.bottom
             : 8,
       ),
+      // Expanded: keempat tab berbagi lebar layar, jadi label yang lebih lebar
+      // (karena font perangkat besar) tidak mendorong tab lain keluar layar.
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(0, Icons.home_rounded, 'Home'),
-          _buildNavItem(1, Icons.coffee_rounded, 'Menu'),
-          _buildNavItem(2, Icons.receipt_long_outlined, 'Orders'),
-          _buildNavItem(3, Icons.person_outline_rounded, 'Profile'),
+          Expanded(child: _buildNavItem(0, Icons.home_rounded, 'Home')),
+          Expanded(child: _buildNavItem(1, Icons.coffee_rounded, 'Menu')),
+          Expanded(
+            child: _buildNavItem(2, Icons.receipt_long_outlined, 'Orders'),
+          ),
+          Expanded(
+            child: _buildNavItem(3, Icons.person_outline_rounded, 'Profile'),
+          ),
         ],
       ),
     );
@@ -65,12 +70,16 @@ class MainBottomNavBar extends StatelessWidget {
               size: 24,
             ),
             const SizedBox(height: 3),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 11.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 11.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
             ),
             const SizedBox(height: 2),

@@ -26,27 +26,34 @@ class HistoryOrderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    order.dateLabel,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isCancelled ? AppColors.textMuted : AppColors.bark,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.dateLabel,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isCancelled
+                            ? AppColors.textMuted
+                            : AppColors.bark,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    order.id,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: textColor,
+                    const SizedBox(height: 4),
+                    Text(
+                      order.id,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               OrderStatusChip(status: order.status),
             ],
           ),

@@ -55,9 +55,13 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             ChatAvatar(size: 36),
             SizedBox(width: 10),
-            Text(
-              'Asisten Yap Coffee',
-              style: TextStyle(fontWeight: FontWeight.w700),
+            Flexible(
+              child: Text(
+                'Asisten Yap Coffee',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ),

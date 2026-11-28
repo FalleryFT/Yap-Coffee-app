@@ -135,6 +135,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
           title: const Text(
             'Notifikasi',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: AppColors.espresso,
               fontSize: 20,

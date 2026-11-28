@@ -9,8 +9,9 @@ class PaymentMethodBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 192,
-      height: 192,
+      // Ukuran minimum seperti kotak QR; tinggi boleh bertambah bila teks
+      // membesar agar tidak terpotong.
+      constraints: const BoxConstraints(minWidth: 192, minHeight: 192),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,

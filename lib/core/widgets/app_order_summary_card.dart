@@ -63,20 +63,32 @@ class OrderSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                totalLabel,
-                style: TextStyle(
-                  fontSize: totalFontSize,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.ink,
+              Flexible(
+                child: Text(
+                  totalLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: totalFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                  ),
                 ),
               ),
-              Text(
-                totalValue,
-                style: TextStyle(
-                  fontSize: totalFontSize,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.espresso,
+              const SizedBox(width: 8),
+              // Nominal tetap terbaca utuh: mengecil bila ruangnya sempit.
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    totalValue,
+                    style: TextStyle(
+                      fontSize: totalFontSize,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.espresso,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -90,13 +102,25 @@ class OrderSummaryCard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          row.label,
-          style: TextStyle(fontSize: labelFontSize, color: AppColors.bark),
+        Flexible(
+          child: Text(
+            row.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: labelFontSize, color: AppColors.bark),
+          ),
         ),
-        Text(
-          row.value,
-          style: TextStyle(fontSize: labelFontSize, color: AppColors.bark),
+        const SizedBox(width: 8),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: Text(
+              row.value,
+              maxLines: 1,
+              style: TextStyle(fontSize: labelFontSize, color: AppColors.bark),
+            ),
+          ),
         ),
       ],
     );
