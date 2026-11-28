@@ -95,13 +95,17 @@ class PickupInfoCard extends StatelessWidget {
                       color: AppColors.textDark,
                     ),
                     SizedBox(width: 6),
-                    Text(
-                      'TITIK TEMU PENGAMBILAN',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                        color: AppColors.textDark,
+                    Expanded(
+                      child: Text(
+                        'TITIK TEMU PENGAMBILAN',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                          color: AppColors.textDark,
+                        ),
                       ),
                     ),
                   ],

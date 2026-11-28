@@ -57,12 +57,18 @@ class OrdersTabSwitcher extends StatelessWidget {
                 ]
               : null,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.5,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? selectedText : AppColors.textMuted,
+        // Dua tab berbagi lebar; label mengecil bila tidak muat, bukan
+        // terpotong keluar tab.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 13.5,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected ? selectedText : AppColors.textMuted,
+            ),
           ),
         ),
       ),

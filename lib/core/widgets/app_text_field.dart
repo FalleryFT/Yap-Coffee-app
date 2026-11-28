@@ -82,19 +82,30 @@ class AppTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ink,
+        // Label dan aksi (tautan "Lupa Password?" atau badge "Terverifikasi")
+        // berbagi satu baris. Bila ruangnya tidak cukup karena font perangkat
+        // diperbesar, aksi turun ke baris berikutnya alih-alih meluber keluar.
+        SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                ),
               ),
-            ),
-            ?labelAction,
-          ],
+              ?labelAction,
+            ],
+          ),
         ),
         const SizedBox(height: 8),
         TextFormField(

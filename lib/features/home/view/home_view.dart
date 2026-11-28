@@ -148,9 +148,11 @@ class _HomeViewState extends State<HomeView> {
                           bottom: 90,
                         ),
                         sliver: SliverGrid(
+                          // Sama seperti MenuGrid: kolom mengikuti lebar, bukan
+                          // dipaksa selalu dua.
                           gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 240,
                             mainAxisExtent: 300,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 14,

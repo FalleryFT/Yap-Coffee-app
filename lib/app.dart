@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import 'core/navigation/app_navigation.dart';
+import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
+import 'core/utils/responsive.dart';
 import 'features/auth/view/forgot_password_page.dart';
 import 'features/auth/view/login_page.dart';
 import 'features/auth/view/new_password_page.dart';
@@ -50,14 +53,34 @@ class YapCoffeeApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       initialRoute: initialRoute,
       onGenerateRoute: _onGenerateRoute,
-      // Sentuh area kosong di halaman mana pun untuk menutup keyboard.
-      // Tombol, kolom teks, dan daftar yang bisa di-scroll tetap bekerja
-      // normal karena gesture anak selalu menang atas gesture ini.
-      builder: (context, child) => GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: child,
-      ),
+      // Urutan dari luar ke dalam: batasi skala teks, hitung breakpoint dari
+      // lebar jendela asli, lalu pusatkan konten selebar ponsel.
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: AppLayout.textScalerFor(mediaQuery),
+          ),
+          child: ResponsiveBreakpoints.builder(
+            breakpoints: AppLayout.breakpoints,
+            child: ColoredBox(
+              color: AppLayout.backdropColor,
+              child: MaxWidthBox(
+                maxWidth: AppLayout.maxContentWidth,
+                backgroundColor: AppColors.cream,
+                // Sentuh area kosong di halaman mana pun untuk menutup keyboard.
+                // Tombol, kolom teks, dan daftar yang bisa di-scroll tetap
+                // bekerja normal karena gesture anak selalu menang.
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                  child: child,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

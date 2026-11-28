@@ -42,18 +42,39 @@ class AppEmblem extends StatelessWidget {
 
   final double size;
 
+  /// Lebar file logo terhadap tingginya (180x43).
+  static const double _logoAspectRatio = 180 / 43;
+
+  /// Lingkaran emblem menempel ke tepi file logo, jadi gambar diperkecil
+  /// sedikit di dalam kotak [size] supaya lingkarannya tidak terpotong.
+  static const double _scale = 0.92;
+
   @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: Align(
-        alignment: Alignment.centerLeft,
-        widthFactor: 0.27,
-        heightFactor: 0.9,
-        child: Image.asset(
-          'assets/images/yap_coffee_logo.png',
-          height: size / 0.9,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
+    // Kalau hanya tinggi gambar yang diatur, lebarnya ikut dipaksa selebar
+    // kotak [size], sehingga seluruh logo mengecil dan emblemnya terpotong.
+    // Jadi gambar digambar pada ukuran aslinya (melebihi kotak) lewat
+    // OverflowBox, lalu dipotong di kotak persegi [size].
+    final double imageHeight = size * _scale;
+    final double imageWidth = imageHeight * _logoAspectRatio;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipRect(
+        child: OverflowBox(
+          alignment: Alignment.centerLeft,
+          minWidth: imageWidth,
+          maxWidth: imageWidth,
+          minHeight: imageHeight,
+          maxHeight: imageHeight,
+          child: Image.asset(
+            'assets/images/yap_coffee_logo.png',
+            width: imageWidth,
+            height: imageHeight,
+            fit: BoxFit.fill,
+            filterQuality: FilterQuality.high,
+          ),
         ),
       ),
     );

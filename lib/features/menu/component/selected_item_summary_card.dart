@@ -62,6 +62,8 @@ class SelectedItemSummaryCard extends StatelessWidget {
               children: [
                 Text(
                   item.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -71,23 +73,34 @@ class SelectedItemSummaryCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   variant,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 10),
+                // Harga mengecil lebih dulu; stepper tetap ukuran aslinya.
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      rupiah(totalPrice),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          rupiah(totalPrice),
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textDark,
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     AppQuantityStepper(
                       quantity: quantity,
                       onDecrement: onDecrement,

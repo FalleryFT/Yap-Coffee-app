@@ -88,18 +88,28 @@ class CartItemCard extends StatelessWidget {
                       color: AppColors.bark,
                     ),
                   ),
+                  // Harga mengalah lebih dulu (mengecil bila perlu), stepper
+                  // tetap ukuran aslinya. Tanpa Expanded, nominal panjang +
+                  // stepper meluber keluar kartu.
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        rupiah(item.price),
-                        style: const TextStyle(
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.espresso,
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            rupiah(item.price),
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.espresso,
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       AppQuantityStepper(
                         quantity: item.quantity,
                         onDecrement: () => onQuantityChanged(-1),

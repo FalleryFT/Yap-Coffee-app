@@ -23,6 +23,10 @@ class PickupMapView extends StatefulWidget {
 class _PickupMapViewState extends State<PickupMapView> {
   static const double _zoom = 17;
 
+  /// Peta mengikuti lebar kartu (bukan tinggi tetap) agar tidak melar/terjepit
+  /// saat jendela diubah ukurannya.
+  static const double _aspectRatio = 4 / 3;
+
   final MapController _controller = MapController();
 
   LatLng get _point => LatLng(widget.latitude, widget.longitude);
@@ -35,10 +39,10 @@ class _PickupMapViewState extends State<PickupMapView> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: SizedBox(
-        height: 240,
+    return AspectRatio(
+      aspectRatio: _aspectRatio,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
         child: Stack(
           children: [
             FlutterMap(
@@ -75,9 +79,7 @@ class _PickupMapViewState extends State<PickupMapView> {
                     ),
                   ],
                 ),
-                const SimpleAttributionWidget(
-                  source: Text('© OpenStreetMap contributors'),
-                ),
+                const _MapAttribution(),
               ],
             ),
             Positioned(
@@ -104,19 +106,55 @@ class _PickupMapViewState extends State<PickupMapView> {
             Positioned(
               top: 10,
               left: 10,
+              // Sisi kanan disisakan untuk tombol lokasi supaya teks tidak
+              // menabraknya dan tidak meluber keluar peta.
+              right: 58,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
                   'Geser dan cubit untuk melihat sekitar',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 10.5, color: AppColors.textDark),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Atribusi wajib OpenStreetMap.
+///
+/// SimpleAttributionWidget bawaan flutter_map menyusun teksnya dalam Row tanpa
+/// Flexible, sehingga meluber saat font diperbesar. Satu blok teks di bawah
+/// bisa dipotong dengan ellipsis dan tetap terlihat.
+class _MapAttribution extends StatelessWidget {
+  const _MapAttribution();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: ColoredBox(
+        color: Colors.white.withValues(alpha: 0.8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          child: Text(
+            '© OpenStreetMap contributors',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 10, color: AppColors.textDark),
+          ),
         ),
       ),
     );

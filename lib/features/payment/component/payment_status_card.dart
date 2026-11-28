@@ -15,10 +15,14 @@ class PaymentStatusCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'pembayaran terselesaikan',
-            style: TextStyle(fontSize: 14, color: AppColors.ink),
+          const Expanded(
+            child: Text(
+              'pembayaran terselesaikan',
+              maxLines: 2,
+              style: TextStyle(fontSize: 14, color: AppColors.ink),
+            ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(

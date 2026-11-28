@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 import '../../../core/network/api_exception.dart';
 import '../../auth/data/auth_repository.dart';
 import '../../home/viewmodel/home_view_model.dart';
-import '../../orders/data/order_repository.dart';
 import '../../orders/model/order_model.dart';
 import '../../orders/viewmodel/order_view_model.dart';
+import '../data/payment_repository.dart';
 import '../model/snap_session.dart';
 
 /// State halaman pembayaran: hitung mundur, pengecekan status berkala, dan pembuatan sesi Midtrans.
@@ -15,12 +15,12 @@ import '../model/snap_session.dart';
 class PaymentViewModel extends ChangeNotifier {
   PaymentViewModel({
     required OrderModel order,
-    OrderRepository? repository,
+    PaymentRepository? repository,
     AuthRepository? authRepository,
     OrderViewModel? orders,
     HomeViewModel? home,
     this.pollInterval = const Duration(seconds: 5),
-  })  : _repository = repository ?? OrderRepository(),
+  })  : _repository = repository ?? PaymentRepository(),
         _authRepository = authRepository ?? AuthRepository(),
         _orders = orders ?? OrderViewModel.instance,
         _home = home ?? HomeViewModel.instance,
@@ -30,7 +30,7 @@ class PaymentViewModel extends ChangeNotifier {
           Duration(seconds: order.paymentSecondsLeft),
         );
 
-  final OrderRepository _repository;
+  final PaymentRepository _repository;
   final AuthRepository _authRepository;
   final OrderViewModel _orders;
   final HomeViewModel _home;
@@ -140,7 +140,8 @@ class PaymentViewModel extends ChangeNotifier {
     if (refreshing || _disposed) return;
     refreshing = true;
     try {
-      final latest = await _repository.get(_order.id);
+      // Server menanyakan Midtrans langsung, jadi status tetap berubah walau webhook belum sampai.
+      final latest = await _repository.syncPayment(_order.id);
       _applyOrder(latest);
     } on ApiException {
       // Gangguan jaringan sesaat; coba lagi pada putaran berikutnya.

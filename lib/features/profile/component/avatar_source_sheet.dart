@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/responsive.dart';
 
 typedef AvatarSourceCallback = void Function(ImageSource source);
 
@@ -15,77 +16,92 @@ Future<void> showAvatarSourceSheet(
 }) {
   return showModalBottomSheet<void>(
     context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.line,
-                borderRadius: BorderRadius.circular(2),
+    // Lebar maksimal sama dengan konten aplikasi agar tidak melar di web.
+    builder: (ctx) => ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: AppLayout.maxContentWidth),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          16,
+          20,
+          MediaQuery.paddingOf(ctx).bottom + 32,
+        ),
+        // Bisa digulir: dengan font perangkat besar, isi sheet bisa lebih
+        // tinggi dari layar.
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 18),
+              const Text(
+                'Ubah Foto Profil',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Pilih foto dari galeri atau ambil foto langsung lewat kamera',
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+              ),
+              const SizedBox(height: 20),
+              _SheetOption(
+                icon: Icons.photo_camera_rounded,
+                title: 'Ambil Foto Lewat Kamera',
+                subtitle: 'Gunakan kamera untuk mengambil foto baru',
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  onPick(ImageSource.camera);
+                },
+              ),
+              const SizedBox(height: 8),
+              _SheetOption(
+                icon: Icons.photo_library_rounded,
+                title: 'Pilih dari Galeri',
+                subtitle: 'Pilih foto yang tersimpan di perangkat Anda',
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  onPick(ImageSource.gallery);
+                },
+              ),
+              if (hasCustomAvatar) ...[
+                const SizedBox(height: 8),
+                _SheetOption(
+                  icon: Icons.delete_outline_rounded,
+                  iconBackground: const Color(0xFFFFDAD6),
+                  iconColor: const Color(0xFF9B1C1C),
+                  titleColor: const Color(0xFF9B1C1C),
+                  title: 'Hapus Foto Kustom',
+                  subtitle: 'Kembalikan ke foto profil default',
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    onRemove();
+                  },
+                ),
+              ],
+            ],
           ),
-          const SizedBox(height: 18),
-          const Text(
-            'Ubah Foto Profil',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Pilih foto dari galeri atau ambil foto langsung lewat kamera',
-            style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-          ),
-          const SizedBox(height: 20),
-          _SheetOption(
-            icon: Icons.photo_camera_rounded,
-            title: 'Ambil Foto Lewat Kamera',
-            subtitle: 'Gunakan kamera untuk mengambil foto baru',
-            onTap: () {
-              Navigator.of(ctx).pop();
-              onPick(ImageSource.camera);
-            },
-          ),
-          const SizedBox(height: 8),
-          _SheetOption(
-            icon: Icons.photo_library_rounded,
-            title: 'Pilih dari Galeri',
-            subtitle: 'Pilih foto yang tersimpan di perangkat Anda',
-            onTap: () {
-              Navigator.of(ctx).pop();
-              onPick(ImageSource.gallery);
-            },
-          ),
-          if (hasCustomAvatar) ...[
-            const SizedBox(height: 8),
-            _SheetOption(
-              icon: Icons.delete_outline_rounded,
-              iconBackground: const Color(0xFFFFDAD6),
-              iconColor: const Color(0xFF9B1C1C),
-              titleColor: const Color(0xFF9B1C1C),
-              title: 'Hapus Foto Kustom',
-              subtitle: 'Kembalikan ke foto profil default',
-              onTap: () {
-                Navigator.of(ctx).pop();
-                onRemove();
-              },
-            ),
-          ],
-        ],
+        ),
       ),
     ),
   );

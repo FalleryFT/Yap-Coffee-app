@@ -100,13 +100,17 @@ class PickupScheduleCard extends StatelessWidget {
                 color: AppColors.espresso,
               ),
               SizedBox(width: 8),
-              Text(
-                'TITIK TEMU PENGAMBILAN',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.espresso,
-                  letterSpacing: 0.2,
+              Expanded(
+                child: Text(
+                  'TITIK TEMU PENGAMBILAN',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.espresso,
+                    letterSpacing: 0.2,
+                  ),
                 ),
               ),
             ],

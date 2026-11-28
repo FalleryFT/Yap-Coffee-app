@@ -80,6 +80,8 @@ class _CartPageState extends State<CartPage> {
             ),
             title: const Text(
               'Keranjang',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.espresso,
                 fontSize: 18,

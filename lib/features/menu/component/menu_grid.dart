@@ -25,8 +25,10 @@ class MenuGrid extends StatelessWidget {
     return SliverPadding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 90),
       sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        // Lebar kartu dibatasi (bukan jumlah kolom tetap) supaya kolom
+        // menyesuaikan lebar layar dan teks tidak terpotong saat font besar.
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 240,
           mainAxisExtent: 300,
           crossAxisSpacing: 12,
           mainAxisSpacing: 14,

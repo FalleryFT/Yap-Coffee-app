@@ -15,8 +15,8 @@ class OrderDetailTopBar extends StatelessWidget {
         GestureDetector(
           onTap: onBack,
           child: Container(
-            width: 34,
-            height: 34,
+            width: 31,
+            height: 31,
             decoration: BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
@@ -24,7 +24,7 @@ class OrderDetailTopBar extends StatelessWidget {
             ),
             child: const Icon(
               Icons.arrow_back_rounded,
-              size: 18,
+              size: 15,
               color: AppColors.textDark,
             ),
           ),
